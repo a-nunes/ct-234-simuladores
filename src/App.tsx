@@ -104,20 +104,20 @@ const App = () => {
   // Página inicial
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="container mx-auto px-4 py-12">
+      <div className="px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Simuladores de Algoritmos
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
             Explore algoritmos de busca de padrões através de simuladores interativos
             desenvolvidos para auxiliar no aprendizado de Estrutura de Dados e Algoritmos.
           </p>
         </div>
 
         {/* Grid de Simuladores */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {simulators.map((simulator) => {
             const IconComponent = simulator.icon;
             return (
@@ -166,7 +166,7 @@ const App = () => {
 
         {/* Footer */}
         <div className="text-center mt-16">
-          <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Sobre os Simuladores
             </h3>

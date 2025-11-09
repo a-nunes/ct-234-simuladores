@@ -353,7 +353,7 @@ const KMPSimulator = () => {
   const stepData = steps[currentStep];
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 bg-white">
+    <div className="w-full p-6 bg-white">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Simulador KMP (Knuth-Morris-Pratt) - Passo a Passo</h1>
       
       <div className="mb-6 space-y-4">
