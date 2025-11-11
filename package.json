@@ -1,6 +1,23 @@
 {
-  "name": "boyer-moore",
-  "version": "0.1.0",
+  "name": "ct-234-simuladores",
+  "version": "1.0.0",
+  "description": "Plataforma interativa de visualização de algoritmos para o ITA",
+  "author": "Instituto Tecnológico de Aeronáutica (ITA)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/ct-234-simuladores.git"
+  },
+  "keywords": [
+    "algorithms",
+    "visualization",
+    "education",
+    "ITA",
+    "graph-algorithms",
+    "string-matching",
+    "interactive",
+    "simulator"
+  ],
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

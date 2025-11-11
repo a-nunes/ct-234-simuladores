@@ -1,0 +1,90 @@
+name: 🐛 Bug Report
+description: Reportar um bug ou comportamento inesperado
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha as informações abaixo.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Descrição do Bug
+      description: Uma descrição clara e concisa do bug
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔄 Passos para Reproduzir
+      description: Como reproduzir o comportamento
+      placeholder: |
+        1. Vá para '...'
+        2. Clique em '...'
+        3. Role até '...'
+        4. Veja o erro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ Comportamento Esperado
+      description: O que você esperava que acontecesse?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ❌ Comportamento Atual
+      description: O que realmente aconteceu?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: Se aplicável, adicione screenshots para ajudar a explicar o problema
+
+  - type: dropdown
+    id: simulator
+    attributes:
+      label: 🎯 Simulador Afetado
+      options:
+        - KMP
+        - Autômato Finito
+        - Boyer-Moore
+        - Ordenação Topológica
+        - Tarjan
+        - Aplicações de Grafos
+        - Grafos Não-Orientados
+        - Dijkstra
+        - Árvore Geradora Mínima (MST)
+        - Editor de Grafos
+        - Outro/Geral
+
+  - type: input
+    id: browser
+    attributes:
+      label: 🌐 Navegador
+      placeholder: "Chrome 120, Firefox 121, Safari 17, etc."
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: 💻 Sistema Operacional
+      placeholder: "Windows 11, macOS 14, Ubuntu 22.04, etc."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📋 Informações Adicionais
+      description: Qualquer outra informação relevante sobre o problema

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentação
+    url: https://github.com/seu-usuario/ct-234-simuladores/tree/main/docs
+    about: Consulte a documentação do projeto
+  - name: 💬 Discussões
+    url: https://github.com/seu-usuario/ct-234-simuladores/discussions
+    about: Faça perguntas e participe de discussões com a comunidade

@@ -1,0 +1,77 @@
+name: ✨ Feature Request
+description: Sugerir uma nova funcionalidade ou melhoria
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova funcionalidade! 
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problema ou Necessidade
+      description: Descreva o problema que esta funcionalidade resolveria
+      placeholder: "Seria útil ter... porque..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Solução Proposta
+      description: Descreva a funcionalidade que você gostaria de ver
+      placeholder: "Eu gostaria que..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternativas Consideradas
+      description: Descreva soluções alternativas que você considerou
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 📂 Categoria
+      options:
+        - Novo Simulador
+        - Melhoria de Simulador Existente
+        - Interface/UX
+        - Performance
+        - Documentação
+        - Ferramenta/Utilitário
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: ⭐ Prioridade (na sua opinião)
+      options:
+        - Baixa
+        - Média
+        - Alta
+        - Crítica
+
+  - type: textarea
+    id: benefit
+    attributes:
+      label: 🎓 Benefício para Estudantes do ITA
+      description: Como isso beneficiaria os estudantes?
+      placeholder: "Esta funcionalidade ajudaria os alunos a..."
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 🛠️ Sugestão de Implementação
+      description: Se tiver ideias sobre como implementar, compartilhe aqui
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📋 Informações Adicionais
+      description: Qualquer outra informação relevante, links, referências, etc.
