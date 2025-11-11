@@ -1,94 +1,49 @@
-<div align="center"># Getting Started with Create React App
+<div align="center">
 
+# 🎓 CT-234 - Simuladores de Algoritmos
 
+### Instituto Tecnológico de Aeronáutica (ITA)
 
-# 🎓 CT-234 - Simuladores de AlgoritmosThis project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Plataforma Interativa de Visualização de Algoritmos**
 
-
-
-### Instituto Tecnológico de Aeronáutica (ITA)## Available Scripts
-
-
-
-**Plataforma Interativa de Visualização de Algoritmos**In the project directory, you can run:
-
-
-
-[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)### `npm start`
-
+[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4.18-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4.18-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)Runs the app in the development mode.\
-
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-
-
-[🚀 Demo ao Vivo](#) • [📖 Documentação](docs/) • [🐛 Reportar Bug](../../issues) • [💡 Solicitar Feature](../../issues)The page will reload if you make edits.\
-
-You will also see any lint errors in the console.
+[🚀 Demo ao Vivo](#) • [📖 Documentação](docs/) • [🐛 Reportar Bug](../../issues) • [💡 Solicitar Feature](../../issues)
 
 </div>
 
-### `npm test`
+---
+
+## 📋 Sobre o Projeto
+
+Este projeto foi desenvolvido para auxiliar estudantes de pós-graduação do **Instituto Tecnológico de Aeronáutica (ITA)** no estudo e compreensão de algoritmos fundamentais em Ciência da Computação. A plataforma oferece **simuladores interativos** que permitem visualizar, passo a passo, o funcionamento de algoritmos clássicos de:
+
+- 🔍 **Busca de Padrões** (String Matching)
+- 📊 **Teoria dos Grafos** (Graph Theory)
+- 🌳 **Árvores e Estruturas de Dados**
+
+### 🎯 Objetivos
+
+- ✅ Facilitar o aprendizado através de visualização interativa
+- ✅ Permitir experimentação com diferentes entradas e parâmetros
+- ✅ Demonstrar a execução passo a passo dos algoritmos
+- ✅ Fornecer feedback visual sobre estados e transições
+- ✅ Servir como material de apoio para disciplinas de Algoritmos
 
 ---
 
-Launches the test runner in the interactive watch mode.\
+## ✨ Simuladores Disponíveis
 
-## 📋 Sobre o ProjetoSee the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔍 Algoritmos de Busca de Padrões
 
-
-
-Este projeto foi desenvolvido para auxiliar estudantes de pós-graduação do **Instituto Tecnológico de Aeronáutica (ITA)** no estudo e compreensão de algoritmos fundamentais em Ciência da Computação. A plataforma oferece **simuladores interativos** que permitem visualizar, passo a passo, o funcionamento de algoritmos clássicos de:### `npm run build`
-
-
-
-- 🔍 **Busca de Padrões** (String Matching)Builds the app for production to the `build` folder.\
-
-- 📊 **Teoria dos Grafos** (Graph Theory)It correctly bundles React in production mode and optimizes the build for the best performance.
-
-- 🌳 **Árvores e Estruturas de Dados**
-
-The build is minified and the filenames include the hashes.\
-
-### 🎯 ObjetivosYour app is ready to be deployed!
-
-
-
-- ✅ Facilitar o aprendizado através de visualização interativaSee the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-- ✅ Permitir experimentação com diferentes entradas e parâmetros
-
-- ✅ Demonstrar a execução passo a passo dos algoritmos### `npm run eject`
-
-- ✅ Fornecer feedback visual sobre estados e transições
-
-- ✅ Servir como material de apoio para disciplinas de Algoritmos**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-
-
----If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-
-
-## ✨ Simuladores DisponíveisInstead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-
-
-### 🔍 Algoritmos de Busca de PadrõesYou don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-
-
-<table>## Learn More
-
+<table>
 <tr>
+<td width="50%">
 
-<td width="50%">You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-
-
-#### 🤖 Autômato FinitoTo learn React, check out the [React documentation](https://reactjs.org/).
+#### 🤖 Autômato Finito
 
 Construtor interativo de autômatos finitos para reconhecimento de padrões em strings.
 
@@ -102,6 +57,7 @@ Construtor interativo de autômatos finitos para reconhecimento de padrões em s
 <td width="50%">
 
 #### 🔎 Algoritmo KMP
+
 Simulador do algoritmo Knuth-Morris-Pratt para busca eficiente de padrões.
 
 **Funcionalidades:**
@@ -116,6 +72,7 @@ Simulador do algoritmo Knuth-Morris-Pratt para busca eficiente de padrões.
 <td width="50%">
 
 #### 🎯 Algoritmo Boyer-Moore
+
 Implementação do clássico algoritmo Boyer-Moore com heurísticas.
 
 **Funcionalidades:**
@@ -137,6 +94,7 @@ Implementação do clássico algoritmo Boyer-Moore com heurísticas.
 <td width="50%">
 
 #### 🔀 Ordenação Topológica
+
 Compare os algoritmos de ordenação topológica usando Fila (Kahn) e Pilha (DFS).
 
 **Funcionalidades:**
@@ -149,6 +107,7 @@ Compare os algoritmos de ordenação topológica usando Fila (Kahn) e Pilha (DFS
 <td width="50%">
 
 #### 🌐 Tarjan - Classificação de Arcos
+
 Visualize a Busca em Profundidade (DFS) e a classificação de arcos.
 
 **Funcionalidades:**
@@ -163,6 +122,7 @@ Visualize a Busca em Profundidade (DFS) e a classificação de arcos.
 <td width="50%">
 
 #### 🔗 Aplicações de Grafos
+
 Explore algoritmos avançados em grafos direcionados.
 
 **Funcionalidades:**
@@ -175,6 +135,7 @@ Explore algoritmos avançados em grafos direcionados.
 <td width="50%">
 
 #### ⚡ Grafos Não-Orientados
+
 Algoritmos específicos para grafos não-direcionados.
 
 **Funcionalidades:**
@@ -189,6 +150,7 @@ Algoritmos específicos para grafos não-direcionados.
 <td width="50%">
 
 #### 🧭 Algoritmo de Dijkstra
+
 Encontra os caminhos mínimos de uma origem para todos os vértices.
 
 **Funcionalidades:**
@@ -201,6 +163,7 @@ Encontra os caminhos mínimos de uma origem para todos os vértices.
 <td width="50%">
 
 #### 🌳 Árvore Geradora Mínima (MST)
+
 Encontra a árvore geradora de custo mínimo.
 
 **Funcionalidades:**
@@ -216,6 +179,7 @@ Encontra a árvore geradora de custo mínimo.
 ### 🛠️ Ferramentas Auxiliares
 
 #### ✏️ Editor de Grafos
+
 Crie e edite grafos de forma visual ou textual para testar nos simuladores.
 
 **Funcionalidades:**
@@ -238,7 +202,7 @@ Crie e edite grafos de forma visual ou textual para testar nos simuladores.
 
 1. **Clone o repositório**
    ```bash
-   git clone https://github.com/seu-usuario/ct-234-simuladores.git
+   git clone https://github.com/a-nunes/ct-234-simuladores.git
    cd ct-234-simuladores
    ```
 
@@ -252,9 +216,14 @@ Crie e edite grafos de forma visual ou textual para testar nos simuladores.
    npm start
    ```
 
-4. **Acesse no navegador**
-   
-   Abra [http://localhost:3000](http://localhost:3000)
+   O aplicativo será aberto automaticamente em [http://localhost:3000](http://localhost:3000)
+
+### 📦 Scripts Disponíveis
+
+- **`npm start`** - Inicia o servidor de desenvolvimento
+- **`npm test`** - Executa os testes em modo interativo
+- **`npm run build`** - Cria build otimizado para produção
+- **`npm run eject`** - Remove a abstração do Create React App (irreversível)
 
 ### 🏗️ Build para Produção
 
@@ -264,7 +233,7 @@ Para criar uma versão otimizada para produção:
 npm run build
 ```
 
-Os arquivos otimizados estarão na pasta `build/`.
+Os arquivos otimizados estarão na pasta `build/` e estarão prontos para deploy.
 
 ---
 
@@ -336,9 +305,9 @@ ct-234-simuladores/
 
 ### Core
 
-- **[React](https://reactjs.org/)** - Biblioteca JavaScript para construção de interfaces
-- **[TypeScript](https://www.typescriptlang.org/)** - Superset tipado de JavaScript
-- **[TailwindCSS](https://tailwindcss.com/)** - Framework CSS utilitário
+- **[React](https://reactjs.org/)** `19.2.0` - Biblioteca JavaScript para construção de interfaces
+- **[TypeScript](https://www.typescriptlang.org/)** `4.9.5` - Superset tipado de JavaScript
+- **[TailwindCSS](https://tailwindcss.com/)** `3.4.18` - Framework CSS utilitário
 
 ### UI/UX
 
@@ -354,21 +323,12 @@ ct-234-simuladores/
 
 ---
 
-## 🧪 Executar Testes
-
-```bash
-npm test
-```
-
-Executa os testes em modo interativo.
-
----
-
 ## 📚 Documentação Adicional
 
 - **[Guia de Simuladores](docs/SIMULADORES.md)** - Detalhes sobre cada simulador
 - **[Grafos Customizados](docs/CUSTOM_GRAPHS.md)** - Como criar grafos personalizados
 - **[Guia de Deploy](DEPLOY.md)** - Instruções para deploy em produção
+- **[Como Contribuir](CONTRIBUTING.md)** - Diretrizes para contribuidores
 
 ---
 
@@ -391,6 +351,8 @@ Contribuições são muito bem-vindas! Este projeto é mantido para a comunidade
 - Adicione testes quando aplicável
 - Atualize a documentação conforme necessário
 
+Para mais detalhes, consulte [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 ## 📖 Uso Acadêmico
@@ -406,7 +368,7 @@ Este projeto foi desenvolvido com propósitos educacionais para o **Instituto Te
 
 ```
 CT-234 Simuladores de Algoritmos. Instituto Tecnológico de Aeronáutica (ITA).
-Disponível em: https://github.com/seu-usuario/ct-234-simuladores
+Disponível em: https://github.com/a-nunes/ct-234-simuladores
 ```
 
 ---
@@ -427,7 +389,6 @@ Desenvolvido por alunos e professores do **Instituto Tecnológico de Aeronáutic
 
 Para dúvidas, sugestões ou contribuições, entre em contato:
 
-- 📧 Email: seu-email@ita.br
 - 🐛 Issues: [GitHub Issues](../../issues)
 - 💬 Discussions: [GitHub Discussions](../../discussions)
 
