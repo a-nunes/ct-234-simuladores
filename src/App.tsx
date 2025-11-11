@@ -1,9 +1,17 @@
 import './index.css';
 import React, { useState } from 'react';
-import { Search, Bot, Cpu, ArrowRight } from 'lucide-react';
+import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3 } from 'lucide-react';
 import BoyerMooreSimulator from './components/BoyerMooreSimulator';
 import KMPSimulator from './components/KMPSimulator';
 import AutomatonSimulator from './components/AutomatonSimulator';
+import TopologicalSortSimulator from './components/TopologicalSortSimulator';
+import TarjanSimulator from './components/TarjanSimulator';
+import GraphApplicationsSimulator from './components/GraphApplicationsSimulator';
+import UndirectedGraphSimulator from './components/UndirectedGraphSimulator';
+import DijkstraSimulator from './components/DijkstraSimulator';
+import MSTSimulator from './components/MSTSimulator';
+import GraphEditorDemo from './components/GraphEditorDemo';
+import { GraphProvider } from './contexts/GraphContext';
 
 const App = () => {
   const [selectedSimulator, setSelectedSimulator] = useState<string | null>(null);
@@ -41,6 +49,83 @@ const App = () => {
       borderColor: 'border-green-200',
       textColor: 'text-green-700',
       features: ['Heurística de caracteres ruins', 'Comparações eficientes', 'Tabela de última ocorrência']
+    },
+    {
+      id: 'topological-sort',
+      title: 'Ordenação Topológica',
+      description: 'Compare os algoritmos de ordenação topológica usando Fila (Kahn) e Pilha (DFS).',
+      icon: GitBranch,
+      color: 'from-indigo-500 to-indigo-600',
+      bgColor: 'from-indigo-50 to-indigo-100',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      features: ['Algoritmo de Kahn (Fila)', 'DFS com Pilha', 'Detecção de ciclos']
+    },
+    {
+      id: 'tarjan',
+      title: 'Tarjan - Classificação de Arcos',
+      description: 'Visualize a Busca em Profundidade (DFS) e a classificação de arcos em Árvore, Retorno, Avanço e Cruzamento.',
+      icon: Network,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'from-orange-50 to-orange-100',
+      borderColor: 'border-orange-200',
+      textColor: 'text-orange-700',
+      features: ['DFS passo a passo', 'Classificação de arcos', 'Pilha de chamadas recursivas']
+    },
+    {
+      id: 'graph-applications',
+      title: 'Aplicações de Grafos',
+      description: 'Explore algoritmos avançados: Teste de Aciclidade, Ordenação Topológica e Componentes Fortemente Conexas.',
+      icon: Layers,
+      color: 'from-teal-500 to-teal-600',
+      bgColor: 'from-teal-50 to-teal-100',
+      borderColor: 'border-teal-200',
+      textColor: 'text-teal-700',
+      features: ['Teste de aciclidade (DAG)', 'Ordenação topológica', 'Componentes fortemente conexas']
+    },
+    {
+      id: 'undirected-graphs',
+      title: 'Grafos Não-Orientados',
+      description: 'Algoritmos para grafos não-direcionados: Bipartição, Vértices de Corte e Pontes.',
+      icon: Share2,
+      color: 'from-pink-500 to-pink-600',
+      bgColor: 'from-pink-50 to-pink-100',
+      borderColor: 'border-pink-200',
+      textColor: 'text-pink-700',
+      features: ['Teste de bipartição', 'Vértices de corte', 'Arestas de corte (pontes)']
+    },
+    {
+      id: 'dijkstra',
+      title: 'Algoritmo de Dijkstra',
+      description: 'Encontra os caminhos mínimos de uma origem para todos os vértices em grafos com pesos não-negativos.',
+      icon: Navigation,
+      color: 'from-cyan-500 to-cyan-600',
+      bgColor: 'from-cyan-50 to-cyan-100',
+      borderColor: 'border-cyan-200',
+      textColor: 'text-cyan-700',
+      features: ['Caminhos mínimos', 'Fila de prioridade', 'Relaxamento de arestas']
+    },
+    {
+      id: 'mst',
+      title: 'Árvore Geradora Mínima (MST)',
+      description: 'Encontra a árvore geradora de custo mínimo com Kruskal (Union-Find) e Prim (Crescimento).',
+      icon: TreePine,
+      color: 'from-emerald-500 to-emerald-600',
+      bgColor: 'from-emerald-50 to-emerald-100',
+      borderColor: 'border-emerald-200',
+      textColor: 'text-emerald-700',
+      features: ['Algoritmo de Kruskal', 'Algoritmo de Prim', 'Union-Find']
+    },
+    {
+      id: 'graph-editor',
+      title: 'Editor de Grafos',
+      description: 'Crie e edite grafos de forma visual ou por texto. Ferramenta completa para montar seus próprios exemplos.',
+      icon: Edit3,
+      color: 'from-violet-500 to-violet-600',
+      bgColor: 'from-violet-50 to-violet-100',
+      borderColor: 'border-violet-200',
+      textColor: 'text-violet-700',
+      features: ['Editor visual interativo', 'Editor de texto', 'Exemplos pré-definidos']
     }
   ];
 
@@ -53,6 +138,102 @@ const App = () => {
   };
 
   // Renderizar simulador específico
+  if (selectedSimulator === 'graph-applications') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <GraphApplicationsSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'tarjan') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <TarjanSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'topological-sort') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <TopologicalSortSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'undirected-graphs') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <UndirectedGraphSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'dijkstra') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <DijkstraSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'mst') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <MSTSimulator />
+      </div>
+    );
+  }
+
   if (selectedSimulator === 'boyer-moore') {
     return (
       <div>
@@ -97,6 +278,22 @@ const App = () => {
           </button>
         </div>
         <AutomatonSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'graph-editor') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <GraphEditorDemo />
       </div>
     );
   }
