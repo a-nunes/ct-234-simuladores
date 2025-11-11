@@ -381,7 +381,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👨‍💻 Autores e Colaboradores
 
-Desenvolvido por alunos e professores do **Instituto Tecnológico de Aeronáutica (ITA)** para a comunidade acadêmica.
+Desenvolvido por Artur Ligieri Nunes, utilizando o material fornecido pelo **Instituto Tecnológico de Aeronáutica (ITA)**, para a comunidade acadêmica.
 
 ---
 
