@@ -202,6 +202,11 @@ const TarjanSimulator = () => {
     edges.forEach(edge => {
       adjList[edge.from].push(edge.to);
     });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
+    });
 
     // Estado inicial
     simulationSteps.push({

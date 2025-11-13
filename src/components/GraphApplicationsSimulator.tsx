@@ -287,6 +287,11 @@ const GraphApplicationsSimulator = () => {
     edges.forEach(edge => {
       adjList[edge.from].push(edge.to);
     });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
+    });
 
     simulationSteps.push({
       nodes: nodesCopy.map(n => ({ ...n })),
@@ -509,6 +514,11 @@ const GraphApplicationsSimulator = () => {
     edges.forEach(edge => {
       adjList[edge.from].push(edge.to);
     });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
+    });
 
     simulationSteps.push({
       nodes: nodesCopy.map(n => ({ ...n })),
@@ -632,6 +642,11 @@ const GraphApplicationsSimulator = () => {
     const adjList: number[][] = new Array(nodes.length).fill(null).map(() => []);
     edges.forEach(edge => {
       adjList[edge.from].push(edge.to);
+    });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
     });
 
     simulationSteps.push({

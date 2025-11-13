@@ -207,6 +207,11 @@ const DijkstraSimulator = () => {
     edges.forEach(edge => {
       adjList[edge.from].push({ to: edge.to, weight: edge.weight });
     });
+    
+    // Ordena adjacências lexicograficamente (por label do nó destino)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a.to].label.localeCompare(nodesCopy[b.to].label));
+    });
 
     simulationSteps.push({
       nodes: nodesCopy.map(n => ({ ...n })),

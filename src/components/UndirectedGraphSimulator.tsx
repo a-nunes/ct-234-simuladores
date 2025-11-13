@@ -288,6 +288,11 @@ const UndirectedGraphSimulator = () => {
         adjList[edge.from].push(edge.to);
       }
     });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
+    });
 
     simulationSteps.push({
       nodes: nodesCopy.map(n => ({ ...n })),
@@ -498,6 +503,11 @@ const UndirectedGraphSimulator = () => {
         adjList[edge.from].push(edge.to);
       }
     });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
+    });
 
     simulationSteps.push({
       nodes: nodesCopy.map(n => ({ ...n })),
@@ -671,6 +681,11 @@ const UndirectedGraphSimulator = () => {
       if (!adjList[edge.from].includes(edge.to)) {
         adjList[edge.from].push(edge.to);
       }
+    });
+    
+    // Ordena adjacências lexicograficamente (por label)
+    adjList.forEach(neighbors => {
+      neighbors.sort((a, b) => nodesCopy[a].label.localeCompare(nodesCopy[b].label));
     });
 
     simulationSteps.push({
