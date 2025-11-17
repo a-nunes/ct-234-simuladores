@@ -1,6 +1,6 @@
 import './index.css';
 import React, { useState } from 'react';
-import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3 } from 'lucide-react';
+import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3, Binary, Grid3x3, Calculator, Grid, Target, Clock, GitMerge, Coins, Grid2x2, Type, Package, Layers2, Brain } from 'lucide-react';
 import BoyerMooreSimulator from './components/BoyerMooreSimulator';
 import KMPSimulator from './components/KMPSimulator';
 import AutomatonSimulator from './components/AutomatonSimulator';
@@ -11,12 +11,173 @@ import UndirectedGraphSimulator from './components/UndirectedGraphSimulator';
 import DijkstraSimulator from './components/DijkstraSimulator';
 import MSTSimulator from './components/MSTSimulator';
 import GraphEditorDemo from './components/GraphEditorDemo';
+import BinarySearchSimulator from './components/BinarySearchSimulator';
+import TrominoSimulator from './components/TrominoSimulator';
+import KaratsubaSimulator from './components/KaratsubaSimulator';
+import StrassenSimulator from './components/StrassenSimulator';
+import SelectSimulator from './components/SelectSimulator';
+import ActivitySelectionSimulator from './components/ActivitySelectionSimulator';
+import HuffmanSimulator from './components/HuffmanSimulator';
+import CoinChangeSimulator from './components/CoinChangeSimulator';
+import MatrixChainSimulator from './components/MatrixChainSimulator';
+import LCSSimulator from './components/LCSSimulator';
+import KnapsackSimulator from './components/KnapsackSimulator';
+import FibonacciMemoSimulator from './components/FibonacciMemoSimulator';
+import CoinChangeMemoSimulator from './components/CoinChangeMemoSimulator';
 import { GraphProvider } from './contexts/GraphContext';
 
 const App = () => {
   const [selectedSimulator, setSelectedSimulator] = useState<string | null>(null);
 
   const simulators = [
+    // Módulo 1: Divisão-e-Conquista
+    {
+      id: 'binary-search',
+      title: 'Busca Binária',
+      description: 'Algoritmo de divisão-e-conquista que reduz o espaço de busca pela metade a cada passo.',
+      icon: Binary,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'from-blue-50 to-blue-100',
+      borderColor: 'border-blue-200',
+      textColor: 'text-blue-700',
+      features: ['Divisão recursiva', 'Cálculo de pivô', 'Visualização da pilha de chamadas']
+    },
+    {
+      id: 'tromino',
+      title: 'Preenchimento com Treminós',
+      description: 'Divide um tabuleiro 2^n × 2^n em quadrantes e preenche recursivamente com treminós.',
+      icon: Grid3x3,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'from-purple-50 to-purple-100',
+      borderColor: 'border-purple-200',
+      textColor: 'text-purple-700',
+      features: ['Divisão em quadrantes', 'Treminó central', 'Resolução recursiva']
+    },
+    {
+      id: 'karatsuba',
+      title: 'Multiplicação de Karatsuba',
+      description: 'Multiplica inteiros grandes usando apenas 3 multiplicações recursivas em vez de 4.',
+      icon: Calculator,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'from-green-50 to-green-100',
+      borderColor: 'border-green-200',
+      textColor: 'text-green-700',
+      features: ['3 multiplicações recursivas', 'Divisão de números', 'Complexidade O(n^1.585)']
+    },
+    {
+      id: 'strassen',
+      title: 'Multiplicação de Strassen',
+      description: 'Multiplica matrizes usando 7 multiplicações recursivas em vez de 8.',
+      icon: Grid,
+      color: 'from-orange-500 to-red-600',
+      bgColor: 'from-orange-50 to-red-100',
+      borderColor: 'border-orange-200',
+      textColor: 'text-orange-700',
+      features: ['7 multiplicações (P-V)', 'Divisão de matrizes', 'Combinação final']
+    },
+    {
+      id: 'select',
+      title: 'Seleção do k-ésimo Elemento',
+      description: 'Encontra o k-ésimo menor elemento em tempo linear usando mediana das medianas.',
+      icon: Target,
+      color: 'from-indigo-500 to-purple-600',
+      bgColor: 'from-indigo-50 to-purple-100',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      features: ['Grupos de 5 elementos', 'Mediana das medianas', 'Particionamento eficiente']
+    },
+    // Módulo 2: Método Guloso
+    {
+      id: 'activity-selection',
+      title: 'Seleção de Atividades',
+      description: 'Método guloso que sempre escolhe a atividade que termina mais cedo para maximizar o conjunto.',
+      icon: Clock,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'from-green-50 to-green-100',
+      borderColor: 'border-green-200',
+      textColor: 'text-green-700',
+      features: ['Ordenação por término', 'Escolha gulosa', 'Visualização de timeline']
+    },
+    {
+      id: 'huffman',
+      title: 'Huffman / Intercalação Ótima',
+      description: 'Constrói árvore binária de custo mínimo combinando sempre os dois menores elementos.',
+      icon: GitMerge,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'from-purple-50 to-purple-100',
+      borderColor: 'border-purple-200',
+      textColor: 'text-purple-700',
+      features: ['Min-Heap', 'Construção de árvore', 'Compressão de dados']
+    },
+    // Módulo 3: Programação Dinâmica
+    {
+      id: 'coin-change',
+      title: 'Moedas de Troco (PD)',
+      description: 'Programação Dinâmica bottom-up para encontrar o mínimo de moedas necessárias.',
+      icon: Coins,
+      color: 'from-yellow-500 to-orange-600',
+      bgColor: 'from-yellow-50 to-orange-100',
+      borderColor: 'border-yellow-200',
+      textColor: 'text-yellow-700',
+      features: ['Tabelas quant e ultima', 'Preenchimento célula a célula', 'Reconstrução da solução']
+    },
+    {
+      id: 'matrix-chain',
+      title: 'Encadeamento de Matrizes',
+      description: 'Encontra a ordem ótima para multiplicar n matrizes minimizando operações.',
+      icon: Grid2x2,
+      color: 'from-indigo-500 to-purple-600',
+      bgColor: 'from-indigo-50 to-purple-100',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      features: ['Matrizes N e T', 'Preenchimento por diagonais', 'Subestrutura ótima']
+    },
+    {
+      id: 'lcs',
+      title: 'Maior Subsequência Comum (LCS)',
+      description: 'Encontra a maior subsequência comum entre duas strings usando PD.',
+      icon: Type,
+      color: 'from-cyan-500 to-blue-600',
+      bgColor: 'from-cyan-50 to-blue-100',
+      borderColor: 'border-cyan-200',
+      textColor: 'text-cyan-700',
+      features: ['Matrizes c e trace', 'Traceback com setas', 'Aplicações em diff']
+    },
+    {
+      id: 'knapsack',
+      title: 'Mochila 0/1',
+      description: 'Maximiza lucro sem exceder capacidade. Cada item pode ser pego ou não (0/1).',
+      icon: Package,
+      color: 'from-teal-500 to-green-600',
+      bgColor: 'from-teal-50 to-green-100',
+      borderColor: 'border-teal-200',
+      textColor: 'text-teal-700',
+      features: ['Matriz B de lucros', 'Preenchimento por linhas', 'Traceback de itens']
+    },
+    // Módulo 4: Memoization
+    {
+      id: 'fibonacci-memo',
+      title: 'Fibonacci com Memoization',
+      description: 'Abordagem top-down com cache para evitar recálculos recursivos.',
+      icon: Layers2,
+      color: 'from-orange-500 to-red-600',
+      bgColor: 'from-orange-50 to-red-100',
+      borderColor: 'border-orange-200',
+      textColor: 'text-orange-700',
+      features: ['Array m[] de cache', 'Visualização de chamadas', 'Comparação O(2ⁿ) vs O(n)']
+    },
+    {
+      id: 'coin-change-memo',
+      title: 'Troco com Memoization',
+      description: 'Versão top-down recursiva do problema de troco. Compare com a versão PD!',
+      icon: Brain,
+      color: 'from-pink-500 to-purple-600',
+      bgColor: 'from-pink-50 to-purple-100',
+      borderColor: 'border-pink-200',
+      textColor: 'text-pink-700',
+      features: ['Array memo[] top-down', 'Recursão com cache', 'Comparação com PD']
+    },
+    // Busca de Padrões
     {
       id: 'kmp',
       title: 'Algoritmo KMP',
@@ -50,6 +211,7 @@ const App = () => {
       textColor: 'text-green-700',
       features: ['Heurística de caracteres ruins', 'Comparações eficientes', 'Tabela de última ocorrência']
     },
+    // Grafos
     {
       id: 'topological-sort',
       title: 'Ordenação Topológica',
@@ -138,6 +300,121 @@ const App = () => {
   };
 
   // Renderizar simulador específico
+  // Módulo 1: Divisão-e-Conquista
+  if (selectedSimulator === 'binary-search') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <BinarySearchSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'tromino') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <TrominoSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'karatsuba') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <KaratsubaSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'strassen') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <StrassenSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'select') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <SelectSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'activity-selection') {
+    return <ActivitySelectionSimulator onBack={handleBackToHome} />;
+  }
+
+  if (selectedSimulator === 'huffman') {
+    return <HuffmanSimulator onBack={handleBackToHome} />;
+  }
+
+  // Módulo 3: Programação Dinâmica
+  if (selectedSimulator === 'coin-change') {
+    return <CoinChangeSimulator onBack={handleBackToHome} />;
+  }
+
+  if (selectedSimulator === 'matrix-chain') {
+    return <MatrixChainSimulator onBack={handleBackToHome} />;
+  }
+
+  if (selectedSimulator === 'lcs') {
+    return <LCSSimulator onBack={handleBackToHome} />;
+  }
+
+  if (selectedSimulator === 'knapsack') {
+    return <KnapsackSimulator onBack={handleBackToHome} />;
+  }
+
+  // Módulo 4: Memoization
+  if (selectedSimulator === 'fibonacci-memo') {
+    return <FibonacciMemoSimulator onBack={handleBackToHome} />;
+  }
+
+  if (selectedSimulator === 'coin-change-memo') {
+    return <CoinChangeMemoSimulator onBack={handleBackToHome} />;
+  }
+
   if (selectedSimulator === 'graph-applications') {
     return (
       <div>
@@ -305,11 +582,12 @@ const App = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Simuladores de Algoritmos
+            Simuladores de Algoritmos - CT-234
           </h1>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-            Explore algoritmos de busca de padrões através de simuladores interativos
-            desenvolvidos para auxiliar no aprendizado de Estrutura de Dados e Algoritmos.
+            Explore algoritmos através de simuladores interativos: Paradigmas de Programação,
+            Busca de Padrões, Grafos e muito mais. Desenvolvido para auxiliar no aprendizado
+            de Estrutura de Dados e Algoritmos do ITA.
           </p>
         </div>
 
@@ -368,10 +646,10 @@ const App = () => {
               Sobre os Simuladores
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Estes simuladores foram desenvolvidos para auxiliar no estudo de algoritmos
-              de busca de padrões, incluindo KMP, Autômatos Finitos e Boyer-Moore.
-              Cada simulador oferece uma visualização passo a passo dos algoritmos,
-              facilitando a compreensão dos conceitos fundamentais.
+              Estes simuladores foram desenvolvidos para auxiliar no estudo de algoritmos fundamentais,
+              incluindo Paradigmas de Programação (Divisão-e-Conquista, Guloso, Programação Dinâmica),
+              Busca de Padrões (KMP, Boyer-Moore, Autômatos) e Algoritmos em Grafos.
+              Cada simulador oferece uma visualização passo a passo, facilitando a compreensão dos conceitos.
             </p>
           </div>
         </div>
