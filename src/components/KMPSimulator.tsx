@@ -171,7 +171,7 @@ const KMPSimulator = () => {
       comparisons: []
     });
 
-    while (i < n) {
+    while (i < n && (i - j) <= n - m) {
       // Comparação
       comparisonCount++;
       const isMatch = text[i] === pattern[j];
