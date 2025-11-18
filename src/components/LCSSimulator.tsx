@@ -309,7 +309,6 @@ const LCSSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   onChange={(e) => setStringX(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
                   className="w-full px-3 py-2 border rounded-lg font-mono"
                   placeholder="ABCBDAB"
-                  maxLength={15}
                 />
               </div>
               <div>
@@ -320,7 +319,6 @@ const LCSSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   onChange={(e) => setStringY(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
                   className="w-full px-3 py-2 border rounded-lg font-mono"
                   placeholder="BDCABA"
-                  maxLength={15}
                 />
               </div>
             </div>
