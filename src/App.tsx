@@ -12,6 +12,7 @@ import DijkstraSimulator from './components/DijkstraSimulator';
 import MSTSimulator from './components/MSTSimulator';
 import GraphEditorDemo from './components/GraphEditorDemo';
 import BinarySearchSimulator from './components/BinarySearchSimulator';
+import { BinarySearchSimulator as BinarySearchSimulatorRefactored } from '@features/binary-search';
 import TrominoSimulator from './components/TrominoSimulator';
 import KaratsubaSimulator from './components/KaratsubaSimulator';
 import StrassenSimulator from './components/StrassenSimulator';
@@ -28,6 +29,8 @@ import { GraphProvider } from './contexts/GraphContext';
 
 const App = () => {
   const [selectedSimulator, setSelectedSimulator] = useState<string | null>(null);
+  // Temporary: Side-by-side comparison mode (moved to top level to avoid hook rule violation)
+  const [showComparison] = useState(false);
 
   const simulators = [
     // Módulo 1: Divisão-e-Conquista
@@ -302,6 +305,32 @@ const App = () => {
   // Renderizar simulador específico
   // Módulo 1: Divisão-e-Conquista
   if (selectedSimulator === 'binary-search') {
+    if (showComparison) {
+      return (
+        <div>
+          <div className="mb-4">
+            <button
+              onClick={handleBackToHome}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+            >
+              ← Voltar ao Início
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Original</h2>
+              <BinarySearchSimulator />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Refatorado</h2>
+              <BinarySearchSimulatorRefactored />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Use refactored version
     return (
       <div>
         <div className="mb-4">
@@ -312,7 +341,7 @@ const App = () => {
             ← Voltar ao Início
           </button>
         </div>
-        <BinarySearchSimulator />
+        <BinarySearchSimulatorRefactored />
       </div>
     );
   }
