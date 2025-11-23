@@ -138,7 +138,8 @@ src/features/binary-search/
 - `InvalidArrayError.ts` - Erro customizado
 
 **Regras:**
-- ❌ NUNCA importa de `data/` ou `presentation/`
+- ❌ NUNCA importa de `data/` ou `presentation/` (exceto use cases que orquestram)
+- ✅ Use cases podem importar funções de `data/` **apenas para orquestrar**, não para implementar lógica
 - ✅ Pode importar apenas de `domain/` (outras entidades, erros)
 - ✅ Use cases orquestram, não implementam
 
@@ -190,6 +191,127 @@ src/features/binary-search/
 - ✅ Componentes são **puros** (apenas renderização)
 - ✅ Hooks orquestram, componentes apenas exibem
 - ✅ Hook orquestrador compõe hooks menores
+
+### 3.4 Exceções Práticas e Quando Abstrair
+
+**Exceção Prática para Use Cases:**
+
+Use cases na camada Domain podem importar funções de `data/` **apenas para orquestrar**, não para implementar lógica. Esta é uma exceção prática que permite que use cases coordenem validações e gerações de steps sem violar o princípio de orquestração.
+
+**Exemplo:**
+```typescript
+// domain/usecases/GenerateSteps.usecase.ts
+import { Config } from '@features/feature/domain/entities/Config';
+import { Step } from '@features/feature/domain/entities/Step';
+// Exceção prática: importar funções de data/ apenas para orquestrar
+import { validateInput } from '@features/feature/data/validators/InputValidator';
+import { generateSteps } from '@features/feature/data/stepGenerators/StepGenerator';
+
+export class GenerateStepsUseCase {
+  execute(config: Config): Step[] {
+    // Orquestra, não implementa
+    validateInput(config);
+    return generateSteps(config);
+  }
+}
+```
+
+**Critérios para Abstrair para `shared/`:**
+
+**Quando abstrair:**
+1. **Regra dos 3:** Quando pelo menos 3 features diferentes precisam do mesmo código
+2. **Algoritmos de Grafos:** Quando o 2º algoritmo de grafo for implementado (ex: MST após Dijkstra)
+3. **Validação de Duplicação:** Se o código é idêntico ou quase idêntico (>80% similar) entre features
+4. **Manutenibilidade:** Se mudanças futuras precisarão ser sincronizadas entre features
+
+**Quando NÃO abstrair:**
+1. **Código específico:** Se o código é específico de uma feature (ex: `ArrayValidator` para BinarySearch)
+2. **Apenas 1 uso:** Se apenas uma feature usa o código
+3. **Ainda em validação:** Se o padrão ainda está sendo validado (ex: PoC inicial)
+
+**Processo de Abstração:**
+
+Quando chegar o momento de abstrair código compartilhado:
+
+1. **Identificar duplicação:** Comparar código entre features
+2. **Criar estrutura shared/:** Criar pastas e arquivos em `src/shared/`
+3. **Mover código:** Mover código duplicado para shared/
+4. **Atualizar imports:** Atualizar todas as features que usam o código
+5. **Atualizar testes:** Mover/atualizar testes para `shared/__tests__/`
+6. **Validar:** Garantir que todas as features ainda funcionam
+7. **Documentar:** Atualizar guideline com exemplos de uso
+
+### 3.5 Código Compartilhado (Shared/)
+
+**Estrutura de Shared/ (Por Tipo):**
+
+Quando código precisa ser compartilhado entre múltiplas features, use a estrutura `shared/` organizada por tipo:
+
+```
+src/
+  shared/
+    graph-validators/          # Validadores compartilhados de grafos
+      GraphValidator.ts        # Validação básica de grafos (nós, arestas, pesos)
+      NodeValidator.ts         # Validação de nós (IDs únicos, etc)
+      EdgeValidator.ts         # Validação de arestas (referências válidas, etc)
+    hooks/                     # Hooks compartilhados
+      useStepNavigation.ts     # Navegação genérica entre steps
+    components/                # Componentes compartilhados
+      ControlPanel.tsx         # Painel de controle genérico
+      StepIndicator.tsx        # Indicador de step atual
+    domain/                    # Entidades compartilhadas (se necessário)
+      entities/
+        Graph.ts               # Interfaces base de grafos (se houver)
+```
+
+**Quando usar shared/ vs manter em features/:**
+
+- ✅ **Usar shared/:** Código usado por 3+ features ou código que será sincronizado entre features
+- ✅ **Manter em features/:** Código específico de uma feature ou ainda em validação
+
+**Casos Específicos:**
+
+**Caso 1: Binary Search**
+- **Status:** Não abstrair
+- **Razão:** Validadores são específicos (array ordenado, searchValue numérico)
+- **Ação:** Manter em `features/binary-search/data/validators/`
+
+**Caso 2: Dijkstra (Atual)**
+- **Status:** Manter local por enquanto
+- **Razão:** Ainda é o primeiro algoritmo de grafo implementado
+- **Ação:** Aguardar implementação do 2º algoritmo de grafo (MST)
+
+**Caso 3: MST (Próximo)**
+- **Status:** Avaliar abstração após implementação
+- **Razão:** Se GraphValidator for idêntico ou muito similar, abstrair
+- **Ação:** 
+  1. Implementar MST com validador local
+  2. Comparar com GraphValidator do Dijkstra
+  3. Se >80% similar, abstrair para `shared/graph-validators/GraphValidator.ts`
+  4. Atualizar ambos os use cases para usar o shared
+
+**Caso 4: Outros Algoritmos de Grafos**
+- **Status:** Usar shared/ quando disponível
+- **Razão:** Evitar duplicação desde o início
+- **Ação:** Importar de `shared/graph-validators/` ao invés de criar novo
+
+**Exemplo de Uso de Shared/:**
+
+```typescript
+// shared/graph-validators/GraphValidator.ts
+import { Node } from '@features/dijkstra/domain/entities/Node';
+import { Edge } from '@features/dijkstra/domain/entities/Edge';
+import { InvalidGraphError } from '@features/dijkstra/domain/errors/InvalidGraphError';
+
+export function validateGraph(nodes: Node[], edges: Edge[]): void {
+  // Validação compartilhada entre algoritmos de grafos
+  // ...
+}
+
+// features/mst/domain/usecases/GenerateSteps.usecase.ts
+import { validateGraph } from '@shared/graph-validators/GraphValidator';
+// ...
+```
 
 ---
 
@@ -562,9 +684,16 @@ export class InvalidInputError extends Error { }
 
 // 3. Criar use case
 // domain/usecases/GenerateSteps.usecase.ts
+import { Config } from '@features/feature/domain/entities/Config';
+import { Step } from '@features/feature/domain/entities/Step';
+// Exceção prática: importar funções de data/ apenas para orquestrar
+import { validateInput } from '@features/feature/data/validators/InputValidator';
+import { generateSteps } from '@features/feature/data/stepGenerators/StepGenerator';
+
 export class GenerateStepsUseCase {
   execute(config: Config): Step[] {
-    validate(config);
+    // Orquestra, não implementa
+    validateInput(config);
     return generateSteps(config);
   }
 }
