@@ -9,6 +9,7 @@ import TarjanSimulator from './components/TarjanSimulator';
 import GraphApplicationsSimulator from './components/GraphApplicationsSimulator';
 import UndirectedGraphSimulator from './components/UndirectedGraphSimulator';
 import DijkstraSimulator from './components/DijkstraSimulator';
+import { DijkstraSimulator as DijkstraSimulatorRefactored } from '@features/dijkstra';
 import MSTSimulator from './components/MSTSimulator';
 import GraphEditorDemo from './components/GraphEditorDemo';
 import BinarySearchSimulator from './components/BinarySearchSimulator';
@@ -25,12 +26,11 @@ import LCSSimulator from './components/LCSSimulator';
 import KnapsackSimulator from './components/KnapsackSimulator';
 import FibonacciMemoSimulator from './components/FibonacciMemoSimulator';
 import CoinChangeMemoSimulator from './components/CoinChangeMemoSimulator';
-import { GraphProvider } from './contexts/GraphContext';
 
 const App = () => {
   const [selectedSimulator, setSelectedSimulator] = useState<string | null>(null);
   // Temporary: Side-by-side comparison mode (moved to top level to avoid hook rule violation)
-  const [showComparison] = useState(false);
+  const [showComparison] = useState(true);
 
   const simulators = [
     // Módulo 1: Divisão-e-Conquista
@@ -509,6 +509,32 @@ const App = () => {
   }
 
   if (selectedSimulator === 'dijkstra') {
+    if (showComparison) {
+      return (
+        <div>
+          <div className="mb-4">
+            <button
+              onClick={handleBackToHome}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+            >
+              ← Voltar ao Início
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Original</h2>
+              <DijkstraSimulator />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Refatorado</h2>
+              <DijkstraSimulatorRefactored />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Use refactored version
     return (
       <div>
         <div className="mb-4">
@@ -519,7 +545,7 @@ const App = () => {
             ← Voltar ao Início
           </button>
         </div>
-        <DijkstraSimulator />
+        <DijkstraSimulatorRefactored />
       </div>
     );
   }
