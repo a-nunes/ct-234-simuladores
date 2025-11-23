@@ -5,5 +5,12 @@ module.exports = {
     alias: {
       '@features': path.resolve(__dirname, 'src/features')
     }
+  },
+  jest: {
+    configure: {
+      moduleNameMapper: {
+        '^@features/(.*)$': '<rootDir>/src/features/$1'
+      }
+    }
   }
 };
