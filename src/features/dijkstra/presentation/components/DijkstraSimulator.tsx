@@ -1,13 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { Navigation, Shuffle } from 'lucide-react';
 import { useDijkstraSimulator } from '../hooks/useDijkstraSimulator';
-import { useGraphEditor } from '../hooks/useGraphEditor';
+import { useGraphEditor } from '@shared/graph-simulators/hooks/useGraphEditor';
 import { GraphVisualization } from './GraphVisualization';
-import { ControlPanel } from './ControlPanel';
+import { ControlPanel } from '@shared/graph-simulators/components/ControlPanel';
 import { PriorityQueuePanel } from './PriorityQueuePanel';
 import { DistanceTablePanel } from './DistanceTablePanel';
-import { ActionMessagePanel } from './ActionMessagePanel';
+import { ActionMessagePanel } from '@shared/graph-simulators/components/ActionMessagePanel';
 import { FinalPathsPanel } from './FinalPathsPanel';
+import { Node } from '@features/dijkstra/domain/entities/Node';
+import { DijkstraStep } from '@features/dijkstra/domain/entities/DijkstraStep';
 
 export function DijkstraSimulator() {
   const simulator = useDijkstraSimulator({});
@@ -63,6 +65,7 @@ export function DijkstraSimulator() {
               </span>
             </div>
             <button
+              data-testid="change-source-button"
               onClick={() => setShowSourceDialog(true)}
               disabled={simulator.isRunning}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold"
@@ -99,6 +102,8 @@ export function DijkstraSimulator() {
               currentStepIndex={simulator.currentStepIndex}
               totalSteps={simulator.totalSteps}
               onShowRandomDialog={() => setShowRandomDialog(true)}
+              requiredGraphType="directed"
+              requiresWeights={true}
             />
           </div>
 

@@ -1,14 +1,20 @@
 import { useState, useMemo } from 'react';
-import { DijkstraStep } from '@features/dijkstra/domain/entities/DijkstraStep';
 
-export interface UseStepNavigationProps {
-  steps: DijkstraStep[];
+/**
+ * Base interface that all Step types must implement
+ */
+export interface BaseStep {
+  message: string;
+}
+
+export interface UseStepNavigationProps<T extends BaseStep> {
+  steps: T[];
   initialIndex?: number;
 }
 
-export interface UseStepNavigationReturn {
+export interface UseStepNavigationReturn<T extends BaseStep> {
   currentStepIndex: number;
-  currentStep: DijkstraStep | null;
+  currentStep: T | null;
   canGoNext: boolean;
   canGoPrevious: boolean;
   next: () => void;
@@ -18,13 +24,15 @@ export interface UseStepNavigationReturn {
 }
 
 /**
- * Hook for managing navigation between steps.
+ * Generic hook for managing navigation between steps.
  * Handles step index, navigation controls, and current step retrieval.
+ * 
+ * @template T - The step type that extends BaseStep
  */
-export function useStepNavigation({
+export function useStepNavigation<T extends BaseStep>({
   steps,
   initialIndex = -1
-}: UseStepNavigationProps): UseStepNavigationReturn {
+}: UseStepNavigationProps<T>): UseStepNavigationReturn<T> {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(initialIndex);
 
   const currentStep = useMemo(() => {

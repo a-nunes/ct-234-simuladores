@@ -4,7 +4,7 @@ import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navig
 import BoyerMooreSimulator from './components/BoyerMooreSimulator';
 import KMPSimulator from './components/KMPSimulator';
 import AutomatonSimulator from './components/AutomatonSimulator';
-import TopologicalSortSimulator from './components/TopologicalSortSimulator';
+import { TopologicalSortSimulator } from '@features/topological-sort';
 import TarjanSimulator from './components/TarjanSimulator';
 import GraphApplicationsSimulator from './components/GraphApplicationsSimulator';
 import UndirectedGraphSimulator from './components/UndirectedGraphSimulator';

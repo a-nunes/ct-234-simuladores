@@ -1,5 +1,5 @@
 import { validateGraph } from '@features/dijkstra/data/validators/GraphValidator';
-import { InvalidGraphError } from '@features/dijkstra/domain/errors/InvalidGraphError';
+import { InvalidGraphError } from '@shared/graph-simulators/errors/InvalidGraphError';
 import { Node } from '@features/dijkstra/domain/entities/Node';
 import { Edge } from '@features/dijkstra/domain/entities/Edge';
 

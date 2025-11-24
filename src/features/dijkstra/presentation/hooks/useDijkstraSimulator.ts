@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { useStepNavigation } from './useStepNavigation';
+import { useStepNavigation } from '@shared/graph-simulators/hooks/useStepNavigation';
 import { useSimulatorConfig } from './useSimulatorConfig';
 import { useStepGenerator } from './useStepGenerator';
 import { DijkstraStep } from '@features/dijkstra/domain/entities/DijkstraStep';

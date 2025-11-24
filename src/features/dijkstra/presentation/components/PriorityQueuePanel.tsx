@@ -7,7 +7,7 @@ export interface PriorityQueuePanelProps {
 
 export function PriorityQueuePanel({ priorityQueue, getDistanceDisplay }: PriorityQueuePanelProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white rounded-xl shadow-lg p-6" data-testid="priority-queue-panel">
       <h2 className="text-xl font-bold text-slate-800 mb-4">Fila de Prioridade (S)</h2>
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {priorityQueue.length > 0 ? (

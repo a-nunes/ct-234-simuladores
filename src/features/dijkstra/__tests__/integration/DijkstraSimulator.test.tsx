@@ -25,10 +25,11 @@ describe('DijkstraSimulator Integration', () => {
   it('should start simulation and show first step', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
+      expect(screen.getByTestId('action-message-panel')).toBeInTheDocument();
       expect(screen.getByText(/Inicializando/i)).toBeInTheDocument();
     });
   });
@@ -36,20 +37,20 @@ describe('DijkstraSimulator Integration', () => {
   it('should navigate between steps', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Inicializando/i)).toBeInTheDocument();
+      expect(screen.getByTestId('action-message-panel')).toBeInTheDocument();
     });
 
-    const nextButton = screen.getByText('Próximo');
+    const nextButton = screen.getByTestId('next-button');
     expect(nextButton).not.toBeDisabled();
 
     fireEvent.click(nextButton);
 
     await waitFor(() => {
-      const stepIndicator = screen.getByText(/Passo \d+ de \d+/);
+      const stepIndicator = screen.getByTestId('step-indicator');
       expect(stepIndicator).toBeInTheDocument();
     });
   });
@@ -57,45 +58,45 @@ describe('DijkstraSimulator Integration', () => {
   it('should show priority queue panel', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Fila de Prioridade (S)')).toBeInTheDocument();
+      expect(screen.getByTestId('priority-queue-panel')).toBeInTheDocument();
     });
   });
 
   it('should show distance table panel', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Distâncias e Predecessores/i)).toBeInTheDocument();
+      expect(screen.getByTestId('distance-table-panel')).toBeInTheDocument();
     });
   });
 
   it('should show action message panel', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Ação Atual/i)).toBeInTheDocument();
+      expect(screen.getByTestId('action-message-panel')).toBeInTheDocument();
     });
   });
 
   it('should show final paths when simulation completes', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     // Navigate through all steps
     await waitFor(() => {
-      const nextButton = screen.getByText('Próximo');
+      const nextButton = screen.getByTestId('next-button');
       expect(nextButton).toBeInTheDocument();
     });
 
@@ -103,7 +104,7 @@ describe('DijkstraSimulator Integration', () => {
     let attempts = 0;
     const maxAttempts = 50; // Prevent infinite loop
     while (attempts < maxAttempts) {
-      const nextButton = screen.queryByText('Próximo');
+      const nextButton = screen.queryByTestId('next-button');
       if (!nextButton || (nextButton as HTMLButtonElement).disabled) {
         break;
       }
@@ -111,39 +112,39 @@ describe('DijkstraSimulator Integration', () => {
       attempts++;
       // Wait for button state to update by checking if it still exists and is enabled
       await waitFor(() => {
-        const updatedButton = screen.queryByText('Próximo');
+        const updatedButton = screen.queryByTestId('next-button');
         expect(updatedButton).toBeInTheDocument();
       }, { timeout: 100 });
     }
 
     await waitFor(() => {
-      const finalPathsElements = screen.getAllByText(/Caminhos Mínimos/i);
-      expect(finalPathsElements.length).toBeGreaterThan(0);
+      expect(screen.getByTestId('final-paths-panel')).toBeInTheDocument();
     });
   });
 
   it('should reset simulation', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Inicializando/i)).toBeInTheDocument();
+      expect(screen.getByTestId('action-message-panel')).toBeInTheDocument();
     });
 
-    const resetButton = screen.getByText('Resetar');
+    const resetButton = screen.getByTestId('reset-button');
     fireEvent.click(resetButton);
 
     await waitFor(() => {
-      expect(screen.queryByText(/Inicializando/i)).not.toBeInTheDocument();
+      // After reset, start button should be available again
+      expect(screen.getByTestId('start-button')).toBeInTheDocument();
     });
   });
 
   it('should allow changing source node', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const changeSourceButton = screen.getByText('Alterar Origem');
+    const changeSourceButton = screen.getByTestId('change-source-button');
     fireEvent.click(changeSourceButton);
 
     await waitFor(() => {
@@ -160,7 +161,7 @@ describe('DijkstraSimulator Integration', () => {
   it('should generate random graph', async () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const generateButton = screen.getByText('Gerar Grafo');
+    const generateButton = screen.getByTestId('generate-graph-button');
     fireEvent.click(generateButton);
 
     await waitFor(() => {
@@ -191,15 +192,15 @@ describe('DijkstraSimulator Integration', () => {
   it('should disable buttons at correct moments', () => {
     renderWithProvider(<DijkstraSimulator />);
 
-    const startButton = screen.getByText('Iniciar');
+    const startButton = screen.getByTestId('start-button');
     expect(startButton).not.toBeDisabled();
 
-    const previousButton = screen.getByText('Anterior');
+    const previousButton = screen.getByTestId('previous-button');
     expect(previousButton).toBeDisabled();
 
     // Next button only appears when simulation is running
     // So we check that it doesn't exist initially
-    const nextButton = screen.queryByText('Próximo');
+    const nextButton = screen.queryByTestId('next-button');
     expect(nextButton).toBeNull();
   });
 

@@ -13,7 +13,7 @@ export function FinalPathsPanel({ finalDistances, nodes, sourceNodeLabel }: Fina
   }
 
   return (
-    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl shadow-lg p-6">
+    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl shadow-lg p-6" data-testid="final-paths-panel">
       <h2 className="text-xl font-bold text-green-900 mb-4">
         ✅ Caminhos Mínimos
       </h2>

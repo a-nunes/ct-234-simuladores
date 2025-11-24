@@ -1,5 +1,5 @@
 import { RotateCcw, Play, Shuffle, ChevronLeft, ChevronRight } from 'lucide-react';
-import LoadCustomGraphButton from '../../../../components/LoadCustomGraphButton';
+import LoadCustomGraphButton from '../../../components/LoadCustomGraphButton';
 
 export interface ControlPanelProps {
   onStart: () => void;
@@ -13,8 +13,14 @@ export interface ControlPanelProps {
   currentStepIndex: number;
   totalSteps: number;
   onShowRandomDialog: () => void;
+  requiredGraphType?: 'directed' | 'undirected';
+  requiresWeights?: boolean;
 }
 
+/**
+ * Generic control panel component for graph simulators.
+ * Works with any graph simulator that follows the standard pattern.
+ */
 export function ControlPanel({
   onStart,
   onReset,
@@ -26,13 +32,16 @@ export function ControlPanel({
   canGoPrevious,
   currentStepIndex,
   totalSteps,
-  onShowRandomDialog
+  onShowRandomDialog,
+  requiredGraphType = 'directed',
+  requiresWeights = false
 }: ControlPanelProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mt-4">
       <div className="flex justify-between items-center flex-wrap gap-2">
         <div className="flex gap-2 flex-wrap">
           <button
+            data-testid="reset-button"
             onClick={onReset}
             className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
           >
@@ -41,6 +50,7 @@ export function ControlPanel({
           </button>
           
           <button
+            data-testid="generate-graph-button"
             onClick={onShowRandomDialog}
             disabled={isRunning}
             className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -50,8 +60,8 @@ export function ControlPanel({
           </button>
 
           <LoadCustomGraphButton
-            requiredType="directed"
-            requiresWeights={true}
+            requiredType={requiredGraphType}
+            requiresWeights={requiresWeights}
             onLoadGraph={onLoadCustomGraph}
             disabled={isRunning}
           />
@@ -59,6 +69,7 @@ export function ControlPanel({
 
         <div className="flex gap-2">
           <button
+            data-testid="previous-button"
             onClick={onPrevious}
             disabled={!canGoPrevious || !isRunning}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -69,6 +80,7 @@ export function ControlPanel({
           
           {!isRunning ? (
             <button
+              data-testid="start-button"
               onClick={onStart}
               className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
@@ -77,6 +89,7 @@ export function ControlPanel({
             </button>
           ) : (
             <button
+              data-testid="next-button"
               onClick={onNext}
               disabled={!canGoNext}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -89,7 +102,7 @@ export function ControlPanel({
       </div>
 
       {isRunning && (
-        <div className="mt-4">
+        <div className="mt-4" data-testid="step-indicator">
           <div className="text-sm text-slate-600 mb-2">
             Passo {currentStepIndex + 1} de {totalSteps}
           </div>

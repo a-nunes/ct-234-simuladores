@@ -1,6 +1,6 @@
 import { GenerateStepsUseCase } from '@features/dijkstra/domain/usecases/GenerateSteps.usecase';
 import { DijkstraConfig } from '@features/dijkstra/domain/entities/DijkstraConfig';
-import { InvalidGraphError } from '@features/dijkstra/domain/errors/InvalidGraphError';
+import { InvalidGraphError } from '@shared/graph-simulators/errors/InvalidGraphError';
 import { InvalidSourceNodeError } from '@features/dijkstra/domain/errors/InvalidSourceNodeError';
 
 describe('GenerateStepsUseCase', () => {

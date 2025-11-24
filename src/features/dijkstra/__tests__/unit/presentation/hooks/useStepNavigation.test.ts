@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useStepNavigation } from '@features/dijkstra/presentation/hooks/useStepNavigation';
+import { useStepNavigation } from '@shared/graph-simulators/hooks/useStepNavigation';
 import { DijkstraStep } from '@features/dijkstra/domain/entities/DijkstraStep';
 
 describe('useStepNavigation', () => {
