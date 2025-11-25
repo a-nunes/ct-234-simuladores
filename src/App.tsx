@@ -30,7 +30,7 @@ import CoinChangeMemoSimulator from './components/CoinChangeMemoSimulator';
 const App = () => {
   const [selectedSimulator, setSelectedSimulator] = useState<string | null>(null);
   // Temporary: Side-by-side comparison mode (moved to top level to avoid hook rule violation)
-  const [showComparison] = useState(true);
+  const [showComparison] = useState(false);
 
   const simulators = [
     // Módulo 1: Divisão-e-Conquista
