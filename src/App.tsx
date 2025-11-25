@@ -2,7 +2,7 @@ import './index.css';
 import React, { useState } from 'react';
 import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3, Binary, Grid3x3, Calculator, Grid, Target, Clock, GitMerge, Coins, Grid2x2, Type, Package, Layers2, Brain } from 'lucide-react';
 import { BoyerMooreSimulator } from '@features/boyer-moore';
-import KMPSimulator from './components/KMPSimulator';
+import { KMPSimulator } from '@features/kmp';
 import AutomatonSimulator from './components/AutomatonSimulator';
 import { TopologicalSortSimulator } from '@features/topological-sort';
 import TarjanSimulator from './components/TarjanSimulator';

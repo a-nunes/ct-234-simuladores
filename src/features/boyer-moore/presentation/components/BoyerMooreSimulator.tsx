@@ -1,6 +1,6 @@
 import React from 'react';
 import { useBoyerMooreSimulator } from '../hooks/useBoyerMooreSimulator';
-import { InputPanel } from './InputPanel';
+import { InputPanel } from '@shared/pattern-matching';
 import { NavigationControls } from './NavigationControls';
 import { TextVisualization } from './TextVisualization';
 import { BadCharTablePanel } from './BadCharTablePanel';
