@@ -179,7 +179,7 @@ describe('useStepGenerator', () => {
 
     const { result, rerender } = renderHook(
       ({ nodes, edges, dataStructure }) => useStepGenerator({ nodes, edges, dataStructure }),
-      { initialProps: { nodes, edges, dataStructure: 'queue' as const } }
+      { initialProps: { nodes, edges, dataStructure: 'queue' as 'queue' | 'stack' } }
     );
 
     act(() => {

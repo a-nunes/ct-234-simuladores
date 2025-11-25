@@ -31,6 +31,7 @@ describe('useSimulatorConfig', () => {
   const createNode = (id: number, label: string): Node => ({
     id,
     label,
+    state: 'unvisited',
     x: 100,
     y: 200
   });
