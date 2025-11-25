@@ -26,3 +26,4 @@ export interface TopologicalSortStep {
   dataStructure: 'queue' | 'stack'; // Qual estrutura está sendo usada
 }
 
+

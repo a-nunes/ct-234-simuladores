@@ -10,3 +10,4 @@ export interface Node {
   topologicalOrder?: number; // Ordem topológica (f[v])
 }
 
+

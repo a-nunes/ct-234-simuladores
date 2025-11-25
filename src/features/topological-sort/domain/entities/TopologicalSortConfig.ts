@@ -7,3 +7,4 @@ export interface TopologicalSortConfig {
   dataStructure: 'queue' | 'stack'; // Fila ou pilha
 }
 
+
