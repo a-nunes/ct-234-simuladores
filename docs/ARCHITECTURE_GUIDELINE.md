@@ -569,19 +569,51 @@ describe('useStepNavigation', () => {
 
 ### 7.3 Imports
 
-**Em código (TypeScript resolve):**
+**Regra Principal:** Use **SEMPRE** path aliases `@features/*` e `@shared/*` para imports entre camadas ou features. Imports relativos (`./` ou `../`) são permitidos APENAS dentro da mesma pasta/módulo.
+
+**Aliases Disponíveis (craco.config.js):**
+- `@features/*` → `src/features/*`
+- `@shared/*` → `src/shared/*`
+
+**Quando usar alias vs relativo:**
+
+| Situação | Tipo de Import | Exemplo |
+|----------|----------------|---------|
+| Entre camadas (data → domain) | ✅ Alias | `import { Step } from '@features/my-feature/domain/entities/Step'` |
+| Entre features | ✅ Alias | `import { validate } from '@shared/validators/GraphValidator'` |
+| Na mesma camada/pasta | ✅ Relativo | `import { OtherHook } from './useOtherHook'` |
+| Em testes | ✅ Alias | `import { fn } from '@features/my-feature/data/algorithms/Algorithm'` |
+
+**Exemplos de imports corretos:**
+
 ```typescript
+// ✅ CORRETO: data/ importando de domain/ (cross-layer) - usar alias
+import { BoyerMooreStep } from '@features/boyer-moore/domain/entities/BoyerMooreStep';
+import { InvalidInputError } from '@features/boyer-moore/domain/errors/InvalidInputError';
+
+// ✅ CORRETO: presentation/ importando de domain/ (cross-layer) - usar alias
 import { BinarySearchStep } from '@features/binary-search/domain/entities/BinarySearchStep';
-```
 
-**Em testes (Jest resolve via moduleNameMapper):**
-```typescript
-import { useStepNavigation } from '@features/binary-search/presentation/hooks/useStepNavigation';
-```
+// ✅ CORRETO: mesma pasta - usar relativo
+import { useSimulatorConfig } from './useSimulatorConfig';
+import { useStepNavigation } from './useStepNavigation';
 
-**Em App.tsx (webpack resolve via craco.config.js):**
-```typescript
+// ✅ CORRETO: em App.tsx - importar do index.ts da feature
 import { BinarySearchSimulator } from '@features/binary-search';
+import { BoyerMooreSimulator } from '@features/boyer-moore';
+
+// ✅ CORRETO: em testes - usar alias
+import { buildLastOccurrence } from '@features/boyer-moore/data/algorithms/BoyerMooreAlgorithm';
+```
+
+**Exemplos de imports incorretos:**
+
+```typescript
+// ❌ INCORRETO: relativo cross-layer
+import { Step } from '../../domain/entities/Step';
+
+// ❌ INCORRETO: alias para mesma pasta
+import { useOtherHook } from '@features/my-feature/presentation/hooks/useOtherHook';
 ```
 
 ---
