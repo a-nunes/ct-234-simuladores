@@ -1,8 +1,12 @@
 import './index.css';
 import React, { useState } from 'react';
-import { Search, Bot, Cpu, ArrowRight, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3, Binary, Grid3x3, Calculator, Grid, Target, Clock, GitMerge, Coins, Grid2x2, Type, Package, Layers2, Brain } from 'lucide-react';
+import { Search, Bot, Cpu, ArrowRight, ArrowUpDown, GitBranch, Network, Layers, Share2, Navigation, TreePine, Edit3, Binary, Grid3x3, Calculator, Grid, Target, Clock, GitMerge, Coins, Grid2x2, Type, Package, Layers2, Brain, Hash } from 'lucide-react';
 import { BoyerMooreSimulator } from '@features/boyer-moore';
 import { KMPSimulator } from '@features/kmp';
+import { ElementarySortSimulator } from '@features/elementary-sort';
+import { HeapSortSimulator } from '@features/heap-sort';
+import { DivideConquerSortSimulator } from '@features/divide-conquer-sort';
+import { RadixSortSimulator } from '@features/radix-sort';
 import AutomatonSimulator from './components/AutomatonSimulator';
 import { TopologicalSortSimulator } from '@features/topological-sort';
 import TarjanSimulator from './components/TarjanSimulator';
@@ -33,6 +37,51 @@ const App = () => {
   const [showComparison] = useState(false);
 
   const simulators = [
+    // Módulo 0: Ordenação Elementar
+    {
+      id: 'elementary-sort',
+      title: 'Ordenação Elementar',
+      description: 'Bubble Sort, Selection Sort e Insertion Sort com visualização passo a passo.',
+      icon: ArrowUpDown,
+      color: 'from-amber-500 to-orange-600',
+      bgColor: 'from-amber-50 to-orange-100',
+      borderColor: 'border-amber-200',
+      textColor: 'text-amber-700',
+      features: ['Bubble Sort', 'Selection Sort', 'Insertion Sort', 'Pseudocódigo interativo']
+    },
+    {
+      id: 'heap-sort',
+      title: 'Heap Sort',
+      description: 'Ordenação usando estrutura de Max-Heap com visualização em árvore e vetor.',
+      icon: TreePine,
+      color: 'from-green-500 to-emerald-600',
+      bgColor: 'from-green-50 to-emerald-100',
+      borderColor: 'border-green-200',
+      textColor: 'text-green-700',
+      features: ['Build Heap', 'Sift (Peneira)', 'Extração do Máximo', 'Dual View: Árvore + Vetor']
+    },
+    {
+      id: 'divide-conquer-sort',
+      title: 'Divisão e Conquista (Ordenação)',
+      description: 'Merge Sort e Quick Sort com visualização da recursão e pilha de chamadas.',
+      icon: GitBranch,
+      color: 'from-indigo-500 to-purple-600',
+      bgColor: 'from-indigo-50 to-purple-100',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      features: ['Merge Sort', 'Quick Sort', 'Pilha de Recursão', 'Vetor Auxiliar (Merge)']
+    },
+    {
+      id: 'radix-sort',
+      title: 'Radix Sort (LSD)',
+      description: 'Ordenação por distribuição usando dígitos. Processa do menos significativo ao mais significativo.',
+      icon: Hash,
+      color: 'from-cyan-500 to-teal-600',
+      bgColor: 'from-cyan-50 to-teal-100',
+      borderColor: 'border-cyan-200',
+      textColor: 'text-cyan-700',
+      features: ['Baldes (0-9)', 'Distribuição e Coleta', 'Ordenação estável', 'Complexidade O(d × n)']
+    },
     // Módulo 1: Divisão-e-Conquista
     {
       id: 'binary-search',
@@ -303,6 +352,71 @@ const App = () => {
   };
 
   // Renderizar simulador específico
+  // Módulo 0: Ordenação Elementar
+  if (selectedSimulator === 'elementary-sort') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <ElementarySortSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'heap-sort') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <HeapSortSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'divide-conquer-sort') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <DivideConquerSortSimulator />
+      </div>
+    );
+  }
+
+  if (selectedSimulator === 'radix-sort') {
+    return (
+      <div>
+        <div className="mb-4">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            ← Voltar ao Início
+          </button>
+        </div>
+        <RadixSortSimulator />
+      </div>
+    );
+  }
+
   // Módulo 1: Divisão-e-Conquista
   if (selectedSimulator === 'binary-search') {
     if (showComparison) {
