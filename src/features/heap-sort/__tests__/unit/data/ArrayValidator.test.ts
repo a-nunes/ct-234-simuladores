@@ -1,5 +1,5 @@
-import { validateArray, parseArrayInput, generateRandomArray } from '../../../data/validators/ArrayValidator';
-import { InvalidArrayError } from '../../../domain/errors/InvalidArrayError';
+import { validateArray, parseArrayInput, generateRandomArray } from '@features/heap-sort/data/validators/ArrayValidator';
+import { InvalidArrayError } from '@features/heap-sort/domain/errors/InvalidArrayError';
 
 describe('ArrayValidator', () => {
   describe('validateArray', () => {

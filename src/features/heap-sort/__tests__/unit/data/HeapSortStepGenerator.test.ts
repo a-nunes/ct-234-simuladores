@@ -1,5 +1,5 @@
-import { generateHeapSortSteps } from '../../../data/stepGenerators/HeapSortStepGenerator';
-import { HeapSortStep } from '../../../domain/entities/HeapSortStep';
+import { generateHeapSortSteps } from '@features/heap-sort/data/stepGenerators/HeapSortStepGenerator';
+import { HeapSortStep } from '@features/heap-sort/domain/entities/HeapSortStep';
 
 describe('HeapSortStepGenerator', () => {
   describe('generateHeapSortSteps', () => {

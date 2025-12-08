@@ -25,7 +25,7 @@ export interface HeapNode {
 export interface HeapPointer {
   index: number;
   label: string;
-  type: 'current' | 'left' | 'right' | 'larger' | 'swap';
+  type: 'current' | 'left' | 'right' | 'larger' | 'swap' | 'compare';
 }
 
 export interface HeapSortStep {

@@ -3,6 +3,14 @@
  * Uses 0-based indexing for arrays.
  */
 
+export interface HeapTreeNode {
+  index: number;
+  value: number;
+  inHeap: boolean;
+  left: HeapTreeNode | null;
+  right: HeapTreeNode | null;
+}
+
 /**
  * Get left child index (0-based)
  */
@@ -90,4 +98,33 @@ export function heapSort(arr: number[]): void {
     // Sift down on reduced heap
     siftDown(arr, 0, i);
   }
+}
+
+/**
+ * Convert array representation of heap to a binary tree structure.
+ * Only nodes with index < heapSize are included in the tree.
+ */
+export function arrayToTree(arr: number[], heapSize: number): HeapTreeNode | null {
+  if (heapSize <= 0 || arr.length === 0) {
+    return null;
+  }
+
+  const buildNode = (index: number): HeapTreeNode | null => {
+    if (index >= heapSize || index >= arr.length) {
+      return null;
+    }
+
+    const leftIndex = getLeftChild(index);
+    const rightIndex = getRightChild(index);
+
+    return {
+      index,
+      value: arr[index],
+      inHeap: index < heapSize,
+      left: buildNode(leftIndex),
+      right: buildNode(rightIndex)
+    };
+  };
+
+  return buildNode(0);
 }

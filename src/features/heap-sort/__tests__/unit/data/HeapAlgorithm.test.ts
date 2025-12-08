@@ -8,7 +8,7 @@ import {
   buildMaxHeap,
   heapSort,
   arrayToTree,
-} from '../../../data/algorithms/HeapAlgorithm';
+} from '@features/heap-sort/data/algorithms/HeapAlgorithm';
 
 describe('HeapAlgorithm', () => {
   describe('getLeftChild', () => {

@@ -30,6 +30,10 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
   const arr = [...inputArray];
   const n = arr.length;
   const sortedIndices: number[] = [];
+  const withN = (variables: Record<string, number | string> = {}) => ({
+    n,
+    ...variables
+  });
 
   // Initial step
   steps.push({
@@ -42,7 +46,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
     highlightPath: [],
     message: `Iniciando Heap Sort com vetor de ${n} elementos`,
     pseudocodeLine: 1,
-    variables: { n }
+    variables: withN()
   });
 
   // Start build phase
@@ -56,7 +60,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
     highlightPath: [],
     message: `Fase 1: Build - Transformando o vetor em Max-Heap`,
     pseudocodeLine: 2,
-    variables: { n }
+    variables: withN()
   });
 
   // Build phase: sift from n/2-1 down to 0
@@ -64,7 +68,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
   
   for (let i = startIndex; i >= 0; i--) {
     // Generate sift steps for this index
-    generateSiftSteps(arr, i, n, steps, 'build', sortedIndices);
+    generateSiftSteps(arr, i, n, n, steps, 'build', sortedIndices);
   }
 
   // Build complete
@@ -78,7 +82,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
     highlightPath: [],
     message: `Build completo! O vetor agora é um Max-Heap válido`,
     pseudocodeLine: 2,
-    variables: { n }
+    variables: withN()
   });
 
   // Extract phase
@@ -92,7 +96,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
     highlightPath: [],
     message: `Fase 2: Extração - Removendo elementos do heap`,
     pseudocodeLine: 3,
-    variables: { n }
+    variables: withN()
   });
 
   // Extract elements one by one
@@ -115,7 +119,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
       highlightPath: [0, lastIndex],
       message: `Trocando raiz (max=${arr[0]}) com último elemento (${arr[lastIndex]})`,
       pseudocodeLine: 4,
-      variables: { i: heapSize, 'v[1]': arr[0], 'v[i]': arr[lastIndex] }
+      variables: withN({ i: heapSize, 'v[1]': arr[0], 'v[i]': arr[lastIndex] })
     });
 
     // Swap root with last element
@@ -134,12 +138,12 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
       highlightPath: [],
       message: `Elemento ${arr[lastIndex]} está na posição final. Heap reduzido para ${heapSize - 1} elementos`,
       pseudocodeLine: 5,
-      variables: { i: heapSize - 1 }
+      variables: withN({ i: heapSize - 1 })
     });
 
     // Sift down root to restore heap property
     if (heapSize - 1 > 1) {
-      generateSiftSteps(arr, 0, heapSize - 1, steps, 'extract', sortedIndices);
+      generateSiftSteps(arr, 0, heapSize - 1, n, steps, 'extract', sortedIndices);
     }
   }
 
@@ -155,7 +159,7 @@ export function generateHeapSortSteps(inputArray: number[]): HeapSortStep[] {
     highlightPath: [],
     message: `Ordenação completa!`,
     pseudocodeLine: 6,
-    variables: {}
+    variables: withN()
   });
 
   return steps;
@@ -168,11 +172,16 @@ function generateSiftSteps(
   arr: number[],
   startIndex: number,
   heapSize: number,
+  totalSize: number,
   steps: HeapSortStep[],
   phase: 'build' | 'extract',
   sortedIndices: number[]
 ): void {
   let i = startIndex;
+  const withN = (variables: Record<string, number | string> = {}) => ({
+    n: totalSize,
+    ...variables
+  });
 
   // Start sift
   steps.push({
@@ -186,7 +195,7 @@ function generateSiftSteps(
     highlightPath: [i],
     message: `Sift: Verificando nó ${i} (valor=${arr[i]})`,
     pseudocodeLine: 7,
-    variables: { i: i + 1, 'v[i]': arr[i], n: heapSize }
+    variables: withN({ i: i + 1, 'v[i]': arr[i] })
   });
 
   while (true) {
@@ -194,16 +203,16 @@ function generateSiftSteps(
     const right = getRightChild(i);
     let largest = i;
 
-    const pointers: HeapPointer[] = [{ index: i, label: 'i', type: 'current' }];
+    const pointers: HeapPointer[] = [{ index: i, label: 'i', type: 'compare' }];
     const highlightPath: number[] = [i];
 
     // Check children
     if (left < heapSize) {
-      pointers.push({ index: left, label: 'esq', type: 'left' });
+      pointers.push({ index: left, label: 'esq', type: 'compare' });
       highlightPath.push(left);
     }
     if (right < heapSize) {
-      pointers.push({ index: right, label: 'dir', type: 'right' });
+      pointers.push({ index: right, label: 'dir', type: 'compare' });
       highlightPath.push(right);
     }
 
@@ -221,14 +230,14 @@ function generateSiftSteps(
       highlightPath,
       message: `Comparando ${arr[i]} com filhos${left < heapSize ? ` esq=${arr[left]}` : ''}${right < heapSize ? ` dir=${arr[right]}` : ''}`,
       pseudocodeLine: 10,
-      variables: {
+      variables: withN({
         i: i + 1,
         esq: left + 1,
         dir: right + 1,
         'v[i]': arr[i],
         ...(left < heapSize && { 'v[esq]': arr[left] }),
         ...(right < heapSize && { 'v[dir]': arr[right] })
-      }
+      })
     });
 
     // Find largest
@@ -256,7 +265,7 @@ function generateSiftSteps(
         highlightPath: [i, largest],
         message: `Maior filho: ${arr[largest]} na posição ${largest}`,
         pseudocodeLine: 11,
-        variables: { i: i + 1, maior: largest + 1, 'v[maior]': arr[largest] }
+        variables: withN({ i: i + 1, maior: largest + 1, 'v[maior]': arr[largest] })
       });
 
       // Swap step
@@ -275,7 +284,7 @@ function generateSiftSteps(
         highlightPath: [i, largest],
         message: `Trocando ${arr[i]} com ${arr[largest]}`,
         pseudocodeLine: 12,
-        variables: { i: i + 1, maior: largest + 1 }
+        variables: withN({ i: i + 1, maior: largest + 1 })
       });
 
       // Perform swap
@@ -296,7 +305,7 @@ function generateSiftSteps(
         highlightPath: [i],
         message: `Sift completo: nó ${i} está na posição correta`,
         pseudocodeLine: 14,
-        variables: { i: i + 1 }
+        variables: withN({ i: i + 1 })
       });
       break;
     }
