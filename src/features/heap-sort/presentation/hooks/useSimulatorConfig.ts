@@ -15,6 +15,7 @@ export interface UseSimulatorConfigReturn {
   generateWorstCase: () => void;
   generateBestCase: () => void;
   generateRandomCase: () => void;
+  setArraySize: (size: number) => void;
 }
 
 const DEFAULT_ARRAY = [4, 10, 3, 5, 1, 8, 7, 2, 9, 6];
@@ -64,6 +65,14 @@ export function useSimulatorConfig({
     setIsRunning(false);
   }, []);
 
+  const setArraySize = useCallback((size: number) => {
+    const safe = Math.max(3, Math.min(size, 50));
+    const random = Array.from({ length: safe }, () => Math.floor(Math.random() * 100) + 1);
+    setArray(random);
+    setCustomArray(random.join(', '));
+    setIsRunning(false);
+  }, []);
+
   return {
     array,
     customArray,
@@ -73,6 +82,7 @@ export function useSimulatorConfig({
     setIsRunning,
     generateWorstCase,
     generateBestCase,
-    generateRandomCase
+    generateRandomCase,
+    setArraySize
   };
 }

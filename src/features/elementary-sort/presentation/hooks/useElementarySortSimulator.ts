@@ -1,8 +1,10 @@
-import { useEffect, useCallback } from 'react';
-import { useStepNavigation } from './useStepNavigation';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useSimulatorConfig } from './useSimulatorConfig';
 import { useStepGenerator } from './useStepGenerator';
 import { ElementarySortStep, SortAlgorithm } from '@features/elementary-sort/domain/entities/ElementarySortStep';
+import { useSortingSimulation } from '@shared/sorting/hooks/useSortingSimulation';
+import { SortingStep } from '@shared/sorting/types';
+import { toSortingStep } from '../mappers/toSortingStep';
 
 export interface UseElementarySortSimulatorProps {
   initialArray?: number[];
@@ -20,16 +22,19 @@ export interface UseElementarySortSimulatorReturn {
   generateWorstCase: () => void;
   generateBestCase: () => void;
   generateRandomCase: () => void;
+  setArraySize: (value: number) => void;
 
   // Navigation
   currentStepIndex: number;
-  currentStep: ElementarySortStep | null;
+  currentStep: SortingStep | null;
   totalSteps: number;
   canGoNext: boolean;
   canGoPrevious: boolean;
 
   // Actions
   start: () => void;
+  play: () => void;
+  pause: () => void;
   reset: () => void;
   next: () => void;
   previous: () => void;
@@ -37,6 +42,9 @@ export interface UseElementarySortSimulatorReturn {
 
   // State
   isRunning: boolean;
+  isPlaying: boolean;
+  speedMs: number;
+  setSpeedMs: (value: number) => void;
   error: Error | null;
 }
 
@@ -60,20 +68,30 @@ export function useElementarySortSimulator({
     algorithm: config.algorithm
   });
 
-  // Navigation hook
-  const navigation = useStepNavigation({
-    steps: stepGenerator.steps,
-    initialIndex: -1
+  const sortingSteps = useMemo<SortingStep[]>(() => stepGenerator.steps.map(toSortingStep), [stepGenerator.steps]);
+
+  // Shared simulation (play/pause/seek)
+  const simulation = useSortingSimulation({
+    steps: sortingSteps
   });
 
   // Clear steps when config changes
   useEffect(() => {
     if (!config.isRunning) {
       stepGenerator.clearSteps();
-      navigation.reset();
+      simulation.reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.array, config.algorithm]);
+
+  // Start playback once steps are available
+  useEffect(() => {
+    if (config.isRunning && stepGenerator.steps.length > 0) {
+      simulation.goToStep(0);
+      simulation.play();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.isRunning, stepGenerator.steps]);
 
   // Wrapper for applyCustomConfig that also resets
   const applyCustomConfig = useCallback(() => {
@@ -84,15 +102,14 @@ export function useElementarySortSimulator({
   const start = useCallback(() => {
     stepGenerator.generateSteps();
     config.setIsRunning(true);
-    navigation.goToStep(0);
-  }, [stepGenerator, config, navigation]);
+  }, [stepGenerator, config]);
 
   // Reset action: clears everything
   const reset = useCallback(() => {
     stepGenerator.clearSteps();
-    navigation.reset();
+    simulation.reset();
     config.setIsRunning(false);
-  }, [stepGenerator, navigation, config]);
+  }, [stepGenerator, simulation, config]);
 
   return {
     // Config
@@ -105,23 +122,29 @@ export function useElementarySortSimulator({
     generateWorstCase: config.generateWorstCase,
     generateBestCase: config.generateBestCase,
     generateRandomCase: config.generateRandomCase,
+    setArraySize: config.setArraySize,
 
     // Navigation
-    currentStepIndex: navigation.currentStepIndex,
-    currentStep: navigation.currentStep,
-    totalSteps: navigation.totalSteps,
-    canGoNext: navigation.canGoNext,
-    canGoPrevious: navigation.canGoPrevious,
+    currentStepIndex: simulation.currentStepIndex,
+    currentStep: simulation.currentStep,
+    totalSteps: simulation.totalSteps,
+    canGoNext: simulation.currentStepIndex < simulation.totalSteps - 1,
+    canGoPrevious: simulation.currentStepIndex > 0,
 
     // Actions
     start,
+    play: simulation.play,
+    pause: simulation.pause,
     reset,
-    next: navigation.next,
-    previous: navigation.previous,
-    goToStep: navigation.goToStep,
+    next: simulation.next,
+    previous: simulation.previous,
+    goToStep: simulation.goToStep,
 
     // State
     isRunning: config.isRunning,
+    isPlaying: simulation.isPlaying,
+    speedMs: simulation.speedMs,
+    setSpeedMs: simulation.setSpeedMs,
     error: stepGenerator.error
   };
 }

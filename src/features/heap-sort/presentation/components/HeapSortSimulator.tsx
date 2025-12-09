@@ -1,121 +1,127 @@
-import React, { useEffect, useState } from 'react';
-import { TreePine } from 'lucide-react';
+import React, { useEffect } from 'react';
 import { useHeapSortSimulator } from '../hooks/useHeapSortSimulator';
-import { ControlPanel } from './ControlPanel';
-import { ArrayVisualization } from './ArrayVisualization';
-import { TreeVisualization } from './TreeVisualization';
-import { VariablesPanel } from './VariablesPanel';
-import { PseudocodePanel } from './PseudocodePanel';
+import { SortingLayout } from '@shared/sorting/ui/SortingLayout';
+import { PSEUDOCODE_BY_ALGORITHM, COMPLEXITY_BY_ALGORITHM } from '@shared/sorting/meta';
 
 /**
  * Main Heap Sort Simulator component.
- * Features dual view: Array + Binary Tree visualization.
- * Orchestrates all sub-components and uses the orchestrator hook.
- * Contains ZERO business logic - only UI composition.
+ * Uses shared SortingLayout for unified presentation.
  */
 export const HeapSortSimulator: React.FC = () => {
   const simulator = useHeapSortSimulator({
     initialArray: [4, 10, 3, 5, 1, 8, 7, 2, 9, 6]
   });
 
-  // Shared hover state for synchronization between array and tree
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const handlePlayPause = () => {
+    if (!simulator.isRunning) {
+      simulator.start();
+      return;
+    }
+    if (simulator.isPlaying) {
+      simulator.pause();
+    } else {
+      simulator.play();
+    }
+  };
+
+  const handleReset = () => simulator.reset();
+
+  const handleArraySizeChange = (size: number) => {
+    simulator.setArraySize(size);
+    simulator.reset();
+  };
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (simulator.isRunning) {
-        if (e.key === 'ArrowRight' && simulator.canGoNext) {
-          simulator.next();
-        } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
-          simulator.previous();
-        } else if (e.key === ' ') {
-          e.preventDefault();
-          simulator.reset();
-        }
-      } else if (e.key === 'Enter') {
-        simulator.start();
+      if (e.key === 'Enter') {
+        handlePlayPause();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        simulator.reset();
+      } else if (e.key === 'ArrowRight' && simulator.canGoNext) {
+        simulator.next();
+      } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
+        simulator.previous();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [simulator]);
+  }, [simulator, handlePlayPause]);
+
+  const extraControls = (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap gap-2 items-center">
+        <input
+          type="text"
+          value={simulator.customArray}
+          onChange={e => simulator.setCustomArray(e.target.value)}
+          disabled={simulator.isPlaying}
+          placeholder="Ex: 4, 10, 3, 5, 1, 8, 7, 2, 9, 6"
+          className="flex-1 min-w-48 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <button
+          onClick={simulator.applyCustomConfig}
+          disabled={simulator.isPlaying}
+          className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+        >
+          Aplicar
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={simulator.generateRandomCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-50"
+        >
+          Aleatório
+        </button>
+        <button
+          onClick={simulator.generateBestCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-green-100 hover:bg-green-200 text-green-700 disabled:opacity-50"
+        >
+          Max-Heap
+        </button>
+        <button
+          onClick={simulator.generateWorstCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-red-100 hover:bg-red-200 text-red-700 disabled:opacity-50"
+        >
+          Sequencial
+        </button>
+      </div>
+      {simulator.error && (
+        <div className="p-2 text-sm rounded-md border border-red-200 bg-red-50 text-red-700">
+          {simulator.error.message}
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
-              <TreePine className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">Heap Sort</h1>
-              <p className="text-gray-600">
-                Build + Extração: Árvore binária em vetor com propriedade de Max-Heap
-              </p>
-            </div>
-          </div>
-
-          <ControlPanel
-            customArray={simulator.customArray}
-            onCustomArrayChange={simulator.setCustomArray}
-            onApplyCustom={simulator.applyCustomConfig}
-            onGenerateWorstCase={simulator.generateWorstCase}
-            onGenerateBestCase={simulator.generateBestCase}
-            onGenerateRandomCase={simulator.generateRandomCase}
-            onStart={simulator.start}
-            onReset={simulator.reset}
-            onPrevious={simulator.previous}
-            onNext={simulator.next}
-            isRunning={simulator.isRunning}
-            canGoNext={simulator.canGoNext}
-            canGoPrevious={simulator.canGoPrevious}
-            currentStepIndex={simulator.currentStepIndex}
-            totalSteps={simulator.totalSteps}
-          />
-
-          {/* Error display */}
-          {simulator.error && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
-              {simulator.error.message}
-            </div>
-          )}
-
-          {/* Keyboard shortcuts hint */}
-          <div className="mt-4 text-sm text-gray-500">
-            <span className="font-medium">Atalhos:</span>
-            {' '}← Anterior | → Próximo | Enter Iniciar | Espaço Reiniciar
-          </div>
-        </div>
-
-        {/* Main visualization area - Dual View */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-          {/* Tree Visualization */}
-          <TreeVisualization
-            currentStep={simulator.currentStep}
-            originalArray={simulator.array}
-            hoveredIndex={hoveredIndex}
-            onHover={setHoveredIndex}
-          />
-          
-          {/* Array Visualization */}
-          <ArrayVisualization
-            currentStep={simulator.currentStep}
-            originalArray={simulator.array}
-            hoveredIndex={hoveredIndex}
-            onHover={setHoveredIndex}
-          />
-        </div>
-
-        {/* Bottom panels */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <VariablesPanel currentStep={simulator.currentStep} />
-          <PseudocodePanel currentStep={simulator.currentStep} />
-        </div>
-      </div>
-    </div>
+    <SortingLayout
+      title="Heap Sort"
+      description="Build + extração em Max-Heap"
+      baseArray={simulator.array}
+      step={simulator.currentStep}
+      stepIndex={simulator.currentStepIndex}
+      totalSteps={simulator.totalSteps}
+      isPlaying={simulator.isPlaying}
+      speedMs={simulator.speedMs}
+      pseudocode={PSEUDOCODE_BY_ALGORITHM.heap}
+      complexity={COMPLEXITY_BY_ALGORITHM.heap}
+      onPlayPause={handlePlayPause}
+      onReset={handleReset}
+      onPrevious={simulator.previous}
+      onNext={simulator.next}
+      onStepChange={simulator.goToStep}
+      onSpeedChange={simulator.setSpeedMs}
+      arraySize={simulator.array.length}
+      onArraySizeChange={handleArraySizeChange}
+      extraControls={extraControls}
+      showNarration
+    />
   );
 };

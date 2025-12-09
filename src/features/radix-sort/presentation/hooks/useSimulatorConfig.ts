@@ -18,6 +18,7 @@ export interface UseSimulatorConfigReturn {
   generateRandomCase: () => void;
   generateMultiDigitCase: () => void;
   generateSingleDigitCase: () => void;
+  setArraySize: (size: number) => void;
 }
 
 const DEFAULT_ARRAY = [170, 45, 75, 90, 802, 24, 2, 66];
@@ -68,6 +69,14 @@ export function useSimulatorConfig({
     setIsRunning(false);
   }, []);
 
+  const setArraySize = useCallback((size: number) => {
+    const safe = Math.max(3, Math.min(size, 50));
+    const random = Array.from({ length: safe }, () => Math.floor(Math.random() * 1000));
+    setArray(random);
+    setCustomArray(random.join(', '));
+    setIsRunning(false);
+  }, []);
+
   return {
     array,
     base,
@@ -79,6 +88,7 @@ export function useSimulatorConfig({
     setIsRunning,
     generateRandomCase,
     generateMultiDigitCase,
-    generateSingleDigitCase
+    generateSingleDigitCase,
+    setArraySize
   };
 }

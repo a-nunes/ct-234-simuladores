@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react';
-import { ArrowUpDown } from 'lucide-react';
+import React, { useEffect, useMemo } from 'react';
 import { useElementarySortSimulator } from '../hooks/useElementarySortSimulator';
-import { ControlPanel } from './ControlPanel';
-import { ArrayVisualization } from './ArrayVisualization';
-import { VariablesPanel } from './VariablesPanel';
-import { PseudocodePanel } from './PseudocodePanel';
+import { SortingLayout } from '@shared/sorting/ui/SortingLayout';
+import { PSEUDOCODE_BY_ALGORITHM, COMPLEXITY_BY_ALGORITHM } from '@shared/sorting/meta';
+import { SortingAlgorithmKind } from '@shared/sorting/types';
 
 /**
  * Main Elementary Sort Simulator component.
@@ -19,26 +17,6 @@ export const ElementarySortSimulator: React.FC = () => {
   });
 
   // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (simulator.isRunning) {
-        if (e.key === 'ArrowRight' && simulator.canGoNext) {
-          simulator.next();
-        } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
-          simulator.previous();
-        } else if (e.key === ' ') {
-          e.preventDefault();
-          simulator.reset();
-        }
-      } else if (e.key === 'Enter') {
-        simulator.start();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [simulator]);
-
   const algorithmNames = {
     bubble: 'Bubble Sort',
     selection: 'Selection Sort',
@@ -51,78 +29,130 @@ export const ElementarySortSimulator: React.FC = () => {
     insertion: 'Inserção ordenada como "cartas de baralho"'
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg">
-              <ArrowUpDown className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                {algorithmNames[simulator.algorithm]}
-              </h1>
-              <p className="text-gray-600">
-                {algorithmDescriptions[simulator.algorithm]}
-              </p>
-            </div>
-          </div>
+  const pseudocode = useMemo(() => PSEUDOCODE_BY_ALGORITHM[simulator.algorithm as SortingAlgorithmKind], [simulator.algorithm]);
+  const complexity = useMemo(() => COMPLEXITY_BY_ALGORITHM[simulator.algorithm as SortingAlgorithmKind], [simulator.algorithm]);
 
-          <ControlPanel
-            customArray={simulator.customArray}
-            algorithm={simulator.algorithm}
-            onCustomArrayChange={simulator.setCustomArray}
-            onAlgorithmChange={simulator.setAlgorithm}
-            onApplyCustom={simulator.applyCustomConfig}
-            onGenerateWorstCase={simulator.generateWorstCase}
-            onGenerateBestCase={simulator.generateBestCase}
-            onGenerateRandomCase={simulator.generateRandomCase}
-            onStart={simulator.start}
-            onReset={simulator.reset}
-            onPrevious={simulator.previous}
-            onNext={simulator.next}
-            isRunning={simulator.isRunning}
-            canGoNext={simulator.canGoNext}
-            canGoPrevious={simulator.canGoPrevious}
-            currentStepIndex={simulator.currentStepIndex}
-            totalSteps={simulator.totalSteps}
-          />
+  const handlePlayPause = () => {
+    if (!simulator.isRunning) {
+      simulator.start();
+      return;
+    }
+    if (simulator.isPlaying) {
+      simulator.pause();
+    } else {
+      simulator.play();
+    }
+  };
 
-          {/* Error display */}
-          {simulator.error && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
-              {simulator.error.message}
-            </div>
-          )}
+  const handleReset = () => {
+    simulator.reset();
+  };
 
-          {/* Keyboard shortcuts hint */}
-          <div className="mt-4 text-sm text-gray-500">
-            <span className="font-medium">Atalhos:</span>
-            {' '}← Anterior | → Próximo | Enter Iniciar | Espaço Reiniciar
-          </div>
-        </div>
+  const handleArraySizeChange = (size: number) => {
+    simulator.setArraySize(size);
+    simulator.reset();
+  };
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Visualização do Array */}
-          <div className="lg:col-span-2">
-            <ArrayVisualization
-              currentStep={simulator.currentStep}
-              originalArray={simulator.array}
-            />
-          </div>
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handlePlayPause();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        simulator.reset();
+      } else if (e.key === 'ArrowRight' && simulator.canGoNext) {
+        simulator.next();
+      } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
+        simulator.previous();
+      }
+    };
 
-          {/* Painel Direito */}
-          <div className="space-y-6">
-            <VariablesPanel currentStep={simulator.currentStep} />
-            <PseudocodePanel
-              algorithm={simulator.algorithm}
-              activeLine={simulator.currentStep?.pseudocodeLine}
-            />
-          </div>
-        </div>
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [simulator, handlePlayPause]);
+
+  const extraControls = (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap gap-2">
+        {(['bubble', 'selection', 'insertion'] as const).map(opt => (
+          <button
+            key={opt}
+            onClick={() => simulator.setAlgorithm(opt)}
+            className={`px-3 py-2 rounded-lg text-sm font-medium border ${
+              simulator.algorithm === opt ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-700 border-slate-200'
+            }`}
+          >
+            {algorithmNames[opt]}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap gap-2 items-center">
+        <input
+          type="text"
+          value={simulator.customArray}
+          onChange={e => simulator.setCustomArray(e.target.value)}
+          disabled={simulator.isPlaying}
+          placeholder="Ex: 44, 55, 12, 42, 94, 18"
+          className="flex-1 min-w-48 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <button
+          onClick={simulator.applyCustomConfig}
+          disabled={simulator.isPlaying}
+          className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+        >
+          Aplicar
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={simulator.generateRandomCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-50"
+        >
+          Aleatório
+        </button>
+        <button
+          onClick={simulator.generateBestCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-green-100 hover:bg-green-200 text-green-700 disabled:opacity-50"
+        >
+          Melhor Caso
+        </button>
+        <button
+          onClick={simulator.generateWorstCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-red-100 hover:bg-red-200 text-red-700 disabled:opacity-50"
+        >
+          Pior Caso
+        </button>
       </div>
     </div>
+  );
+
+  return (
+    <SortingLayout
+      title={algorithmNames[simulator.algorithm]}
+      description={algorithmDescriptions[simulator.algorithm]}
+      baseArray={simulator.array}
+      step={simulator.currentStep}
+      stepIndex={simulator.currentStepIndex}
+      totalSteps={simulator.totalSteps}
+      isPlaying={simulator.isPlaying}
+      speedMs={simulator.speedMs}
+      pseudocode={pseudocode}
+      complexity={complexity}
+      onPlayPause={handlePlayPause}
+      onReset={handleReset}
+      onPrevious={simulator.previous}
+      onNext={simulator.next}
+      onStepChange={simulator.goToStep}
+      onSpeedChange={simulator.setSpeedMs}
+      arraySize={simulator.array.length}
+      onArraySizeChange={handleArraySizeChange}
+      extraControls={extraControls}
+      showNarration
+    />
   );
 };

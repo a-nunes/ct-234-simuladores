@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
-import { Layers } from 'lucide-react';
+import React, { useEffect, useMemo } from 'react';
 import { useRadixSortSimulator } from '../hooks/useRadixSortSimulator';
-import { ControlPanel } from './ControlPanel';
-import { ArrayVisualization } from './ArrayVisualization';
+import { SortingLayout } from '@shared/sorting/ui/SortingLayout';
+import { PSEUDOCODE_BY_ALGORITHM, COMPLEXITY_BY_ALGORITHM } from '@shared/sorting/meta';
 import { BucketVisualization } from './BucketVisualization';
-import { VariablesPanel } from './VariablesPanel';
-import { PseudocodePanel } from './PseudocodePanel';
 
 /**
  * Main Radix Sort Simulator component.
- * Implements visualization of LSD (Least Significant Digit) Radix Sort.
- * Uses buckets/queues for distribution-based sorting.
- * Contains ZERO business logic - only UI composition.
+ * Uses shared SortingLayout for unified presentation and keeps bucket view below.
  */
 export const RadixSortSimulator: React.FC = () => {
   const simulator = useRadixSortSimulator({
@@ -19,141 +14,146 @@ export const RadixSortSimulator: React.FC = () => {
     initialBase: 10
   });
 
+  const pseudocode = useMemo(() => PSEUDOCODE_BY_ALGORITHM.radix, []);
+  const complexity = useMemo(() => COMPLEXITY_BY_ALGORITHM.radix, []);
+
+  const handlePlayPause = () => {
+    if (!simulator.isRunning) {
+      simulator.start();
+      return;
+    }
+    if (simulator.isPlaying) {
+      simulator.pause();
+    } else {
+      simulator.play();
+    }
+  };
+
+  const handleReset = () => simulator.reset();
+
+  const handleArraySizeChange = (size: number) => {
+    simulator.setArraySize(size);
+    simulator.reset();
+  };
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (simulator.isRunning) {
-        if (e.key === 'ArrowRight' && simulator.canGoNext) {
-          simulator.next();
-        } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
-          simulator.previous();
-        } else if (e.key === ' ') {
-          e.preventDefault();
-          simulator.reset();
-        }
-      } else if (e.key === 'Enter') {
-        simulator.start();
+      if (e.key === 'Enter') {
+        handlePlayPause();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        simulator.reset();
+      } else if (e.key === 'ArrowRight' && simulator.canGoNext) {
+        simulator.next();
+      } else if (e.key === 'ArrowLeft' && simulator.canGoPrevious) {
+        simulator.previous();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [simulator]);
+  }, [simulator, handlePlayPause]);
 
   // Determine current phase for bucket highlighting
   const getPhase = (): 'distribute' | 'collect' | 'idle' => {
-    if (!simulator.currentStep) return 'idle';
-    if (simulator.currentStep.type === 'distribute') return 'distribute';
-    if (simulator.currentStep.type === 'collect') return 'collect';
+    if (!simulator.rawStep) return 'idle';
+    if (simulator.rawStep.type === 'distribute') return 'distribute';
+    if (simulator.rawStep.type === 'collect') return 'collect';
     return 'idle';
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-teal-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-lg">
-              <Layers className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                Radix Sort (LSD)
-              </h1>
-              <p className="text-gray-600">
-                Ordenação por distribuição usando dígitos (Least Significant Digit first)
-              </p>
-            </div>
-          </div>
-
-          <ControlPanel
-            customArray={simulator.customArray}
-            base={simulator.base}
-            onCustomArrayChange={simulator.setCustomArray}
-            onBaseChange={simulator.setBase}
-            onApplyCustom={simulator.applyCustomConfig}
-            onGenerateRandomCase={simulator.generateRandomCase}
-            onGenerateMultiDigitCase={simulator.generateMultiDigitCase}
-            onGenerateSingleDigitCase={simulator.generateSingleDigitCase}
-            onStart={simulator.start}
-            onReset={simulator.reset}
-            onPrevious={simulator.previous}
-            onNext={simulator.next}
-            isRunning={simulator.isRunning}
-            canGoNext={simulator.canGoNext}
-            canGoPrevious={simulator.canGoPrevious}
-            currentStepIndex={simulator.currentStepIndex}
-            totalSteps={simulator.totalSteps}
-          />
-
-          {/* Error display */}
-          {simulator.error && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded-lg text-red-700">
-              {simulator.error.message}
-            </div>
-          )}
-
-          {/* Keyboard shortcuts hint */}
-          <div className="mt-4 text-sm text-gray-500">
-            <span className="font-medium">Atalhos:</span>
-            {' '}← Anterior | → Próximo | Enter Iniciar | Espaço Reiniciar
-          </div>
-        </div>
-
-        {/* Main visualization area */}
-        <div className="space-y-6">
-          {/* Array Visualization */}
-          <ArrayVisualization
-            currentStep={simulator.currentStep}
-            originalArray={simulator.array}
-          />
-
-          {/* Buckets Visualization */}
-          <BucketVisualization
-            buckets={simulator.currentStep?.buckets ?? Array.from({ length: 10 }, (_, i) => ({ digit: i, elements: [] }))}
-            highlightedBucket={simulator.currentStep?.highlightedBucket}
-            currentElement={simulator.currentStep?.currentElement}
-            phase={getPhase()}
-          />
-        </div>
-
-        {/* Side panels */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <VariablesPanel currentStep={simulator.currentStep} />
-          <PseudocodePanel
-            activeLine={simulator.currentStep?.pseudocodeLine}
-          />
-        </div>
-
-        {/* Algorithm explanation */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">
-            Como funciona o Radix Sort?
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4 text-gray-600">
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2">Algoritmo LSD:</h4>
-              <ol className="list-decimal list-inside space-y-1 text-sm">
-                <li>Começa pelo dígito menos significativo (unidades)</li>
-                <li>Distribui os elementos nos baldes (0-9) pelo dígito atual</li>
-                <li>Coleta os elementos dos baldes em ordem</li>
-                <li>Repete para o próximo dígito (dezenas, centenas...)</li>
-                <li>Após processar todos os dígitos, o array está ordenado</li>
-              </ol>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2">Características:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li><strong>Complexidade:</strong> O(d × n) onde d = número de dígitos</li>
-                <li><strong>Estabilidade:</strong> Estável (mantém ordem relativa)</li>
-                <li><strong>Não-comparativo:</strong> Não compara elementos diretamente</li>
-                <li><strong>Requisito:</strong> Funciona apenas com inteiros não-negativos</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+  const extraControls = (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap gap-2 items-center">
+        <input
+          type="text"
+          value={simulator.customArray}
+          onChange={e => simulator.setCustomArray(e.target.value)}
+          disabled={simulator.isPlaying}
+          placeholder="170, 45, 75, 90, 802, 24, 2, 66"
+          className="flex-1 min-w-48 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <input
+          type="number"
+          min={2}
+          max={16}
+          value={simulator.base}
+          onChange={e => simulator.setBase(Number(e.target.value))}
+          disabled={simulator.isPlaying}
+          className="w-24 px-3 py-2 border border-slate-200 rounded-lg text-sm"
+        />
+        <button
+          onClick={simulator.applyCustomConfig}
+          disabled={simulator.isPlaying}
+          className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+        >
+          Aplicar
+        </button>
       </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={simulator.generateRandomCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-50"
+        >
+          Aleatório
+        </button>
+        <button
+          onClick={simulator.generateMultiDigitCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 disabled:opacity-50"
+        >
+          Multi-dígitos
+        </button>
+        <button
+          onClick={simulator.generateSingleDigitCase}
+          disabled={simulator.isPlaying}
+          className="px-3 py-1.5 text-sm rounded-lg bg-green-100 hover:bg-green-200 text-green-700 disabled:opacity-50"
+        >
+          1 dígito
+        </button>
+      </div>
+      {simulator.error && (
+        <div className="p-2 text-sm rounded-md border border-red-200 bg-red-50 text-red-700">
+          {simulator.error.message}
+        </div>
+      )}
     </div>
+  );
+
+  return (
+    <>
+      <SortingLayout
+        title="Radix Sort (LSD)"
+        description="Distribuição por dígitos usando filas de baldes"
+        baseArray={simulator.array}
+        step={simulator.currentStep}
+        stepIndex={simulator.currentStepIndex}
+        totalSteps={simulator.totalSteps}
+        isPlaying={simulator.isPlaying}
+        speedMs={simulator.speedMs}
+        pseudocode={pseudocode}
+        complexity={complexity}
+        onPlayPause={handlePlayPause}
+        onReset={handleReset}
+        onPrevious={simulator.previous}
+        onNext={simulator.next}
+        onStepChange={simulator.goToStep}
+        onSpeedChange={simulator.setSpeedMs}
+        arraySize={simulator.array.length}
+        onArraySizeChange={handleArraySizeChange}
+        extraControls={extraControls}
+        showNarration
+      />
+      <div className="max-w-6xl mx-auto px-4 pb-10">
+        <BucketVisualization
+          buckets={simulator.rawStep?.buckets ?? Array.from({ length: 10 }, (_, i) => ({ digit: i, elements: [] }))}
+          highlightedBucket={simulator.rawStep?.highlightedBucket}
+          currentElement={simulator.rawStep?.currentElement}
+          phase={getPhase()}
+        />
+      </div>
+    </>
   );
 };

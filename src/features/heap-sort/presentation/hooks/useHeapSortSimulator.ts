@@ -1,8 +1,10 @@
-import { useEffect, useCallback } from 'react';
-import { useStepNavigation } from './useStepNavigation';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useSimulatorConfig } from './useSimulatorConfig';
 import { useStepGenerator } from './useStepGenerator';
 import { HeapSortStep } from '@features/heap-sort/domain/entities/HeapSortStep';
+import { SortingStep } from '@shared/sorting/types';
+import { useSortingSimulation } from '@shared/sorting/hooks/useSortingSimulation';
+import { mapHeapStep } from '@shared/sorting/mappers/toSortingSteps';
 
 export interface UseHeapSortSimulatorProps {
   initialArray?: number[];
@@ -17,16 +19,19 @@ export interface UseHeapSortSimulatorReturn {
   generateWorstCase: () => void;
   generateBestCase: () => void;
   generateRandomCase: () => void;
+  setArraySize: (value: number) => void;
 
   // Navigation
   currentStepIndex: number;
-  currentStep: HeapSortStep | null;
+  currentStep: SortingStep | null;
   totalSteps: number;
   canGoNext: boolean;
   canGoPrevious: boolean;
 
   // Actions
   start: () => void;
+  play: () => void;
+  pause: () => void;
   reset: () => void;
   next: () => void;
   previous: () => void;
@@ -34,6 +39,9 @@ export interface UseHeapSortSimulatorReturn {
 
   // State
   isRunning: boolean;
+  isPlaying: boolean;
+  speedMs: number;
+  setSpeedMs: (value: number) => void;
   error: Error | null;
 }
 
@@ -54,17 +62,17 @@ export function useHeapSortSimulator({
     array: config.array
   });
 
-  // Navigation hook
-  const navigation = useStepNavigation({
-    steps: stepGenerator.steps,
-    initialIndex: -1
+  const sortingSteps = useMemo<SortingStep[]>(() => stepGenerator.steps.map(mapHeapStep), [stepGenerator.steps]);
+
+  const simulation = useSortingSimulation({
+    steps: sortingSteps
   });
 
   // Clear steps when config changes
   useEffect(() => {
     if (!config.isRunning) {
       stepGenerator.clearSteps();
-      navigation.reset();
+      simulation.reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.array]);
@@ -78,15 +86,16 @@ export function useHeapSortSimulator({
   const start = useCallback(() => {
     stepGenerator.generateSteps();
     config.setIsRunning(true);
-    navigation.goToStep(0);
-  }, [stepGenerator, config, navigation]);
+    simulation.goToStep(0);
+    simulation.play();
+  }, [stepGenerator, config, simulation]);
 
   // Reset action
   const reset = useCallback(() => {
     stepGenerator.clearSteps();
-    navigation.reset();
+    simulation.reset();
     config.setIsRunning(false);
-  }, [stepGenerator, navigation, config]);
+  }, [stepGenerator, simulation, config]);
 
   return {
     // Config
@@ -97,23 +106,29 @@ export function useHeapSortSimulator({
     generateWorstCase: config.generateWorstCase,
     generateBestCase: config.generateBestCase,
     generateRandomCase: config.generateRandomCase,
+    setArraySize: config.setArraySize,
 
     // Navigation
-    currentStepIndex: navigation.currentStepIndex,
-    currentStep: navigation.currentStep,
-    totalSteps: navigation.totalSteps,
-    canGoNext: navigation.canGoNext,
-    canGoPrevious: navigation.canGoPrevious,
+    currentStepIndex: simulation.currentStepIndex,
+    currentStep: simulation.currentStep,
+    totalSteps: simulation.totalSteps,
+    canGoNext: simulation.currentStepIndex < simulation.totalSteps - 1,
+    canGoPrevious: simulation.currentStepIndex > 0,
 
     // Actions
     start,
+    play: simulation.play,
+    pause: simulation.pause,
     reset,
-    next: navigation.next,
-    previous: navigation.previous,
-    goToStep: navigation.goToStep,
+    next: simulation.next,
+    previous: simulation.previous,
+    goToStep: simulation.goToStep,
 
     // State
     isRunning: config.isRunning,
+    isPlaying: simulation.isPlaying,
+    speedMs: simulation.speedMs,
+    setSpeedMs: simulation.setSpeedMs,
     error: stepGenerator.error
   };
 }
