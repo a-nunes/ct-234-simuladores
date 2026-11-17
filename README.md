@@ -226,7 +226,8 @@ Crie e edite grafos de forma visual ou textual para testar nos simuladores.
 - **`npm run typecheck`** - Verificação de tipos (TypeScript)
 - **`npm run build`** - Typecheck + build otimizado para produção (sem source maps)
 - **`npm run preview`** - Serve o build localmente para conferência
-- **`npm run audit`** - Auditoria de vulnerabilidades das dependências
+- **`npm run audit`** - Auditoria das dependências de runtime (deve estar sempre limpa)
+- **`npm run audit:all`** - Auditoria incluindo ferramentas de build (veja riscos aceitos em [SECURITY.md](SECURITY.md))
 
 ### 🏗️ Build para Produção
 
