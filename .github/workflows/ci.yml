@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Reescaneia semanalmente: novas CVEs aparecem mesmo sem mudanças no código.
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Testes, auditoria e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências (sem scripts de instalação)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Auditoria das dependências de runtime (bloqueante)
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Auditoria das dependências de desenvolvimento (informativa)
+        # Ver SECURITY.md: advisory do picomatch sem correção upstream, só build-time.
+        continue-on-error: true
+        run: npm audit --audit-level=low
+
+      - name: Verificar assinaturas/proveniência do registry
+        run: npm audit signatures
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Testes
+        run: npm test
+
+      - name: Build
+        run: npx vite build
+
+  image:
+    name: Imagem Docker + scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build da imagem
+        run: docker build -t ct-234-simuladores:ci .
+
+      - name: Smoke test do container endurecido
+        run: |
+          docker run -d --name ct234 -p 127.0.0.1:8080:8080 \
+            --read-only --tmpfs /tmp:size=16m,mode=1777 \
+            --cap-drop ALL --security-opt no-new-privileges:true \
+            ct-234-simuladores:ci
+          for i in $(seq 1 20); do curl -fsS http://127.0.0.1:8080/healthz && break; sleep 1; done
+          curl -fsSI http://127.0.0.1:8080/ | tee headers.txt
+          grep -qi '^content-security-policy:' headers.txt
+          grep -qi '^x-content-type-options: nosniff' headers.txt
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/.env)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:8080/)" = 405
+
+      - name: Scan de vulnerabilidades (Trivy)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro \
+            aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c \
+            image --quiet --exit-code 1 --ignore-unfixed \
+            --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
+            ct-234-simuladores:ci

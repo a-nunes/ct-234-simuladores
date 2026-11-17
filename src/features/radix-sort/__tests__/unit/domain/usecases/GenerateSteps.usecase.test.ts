@@ -20,6 +20,14 @@ describe('GenerateStepsUseCase', () => {
       expect(steps[steps.length - 1].type).toBe('complete');
     });
 
+    it.each([1, 0, -2, 2.5, 17, 1e9, NaN])('should reject invalid base %p (DoS guard)', (base) => {
+      expect(() => useCase.execute({ array: [170, 45, 75, 90], base })).toThrow(InvalidArrayError);
+    });
+
+    it.each([2, 16])('should accept boundary base %p', (base) => {
+      expect(() => useCase.execute({ array: [170, 45, 75, 90], base })).not.toThrow();
+    });
+
     it('should throw for invalid array', () => {
       expect(() => useCase.execute({
         array: [],

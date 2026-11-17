@@ -31,6 +31,17 @@ export function validateArray(array: number[]): void {
 }
 
 /**
+ * Validates the numeric base used by Radix Sort.
+ * Base 1 never advances the digit position (log(1) = 0 → infinite loop) and
+ * huge bases allocate one bucket per possible digit, so the range is bounded.
+ */
+export function validateBase(base: number): void {
+  if (!Number.isInteger(base) || base < 2 || base > 16) {
+    throw new InvalidArrayError('A base deve ser um número inteiro entre 2 e 16');
+  }
+}
+
+/**
  * Parses a string input into an array of numbers.
  * Accepts formats: "1, 2, 3" or "1 2 3" or "[1, 2, 3]"
  */

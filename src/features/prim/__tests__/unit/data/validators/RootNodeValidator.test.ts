@@ -77,7 +77,7 @@ describe('RootNodeValidator', () => {
 
       try {
         validateRootNode(99, nodes);
-        fail('Should have thrown error');
+        expect.unreachable('Should have thrown error');
       } catch (error) {
         expect(error).toBeInstanceOf(InvalidRootNodeError);
         expect((error as Error).message).toContain('99');

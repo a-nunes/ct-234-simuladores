@@ -1,11 +1,22 @@
-node_modules
-npm-debug.log
-build
-.dockerignore
-Dockerfile
-.git
-.gitignore
-README.md
-.env
-.DS_Store
-*.log
+# Allowlist: o contexto de build só leva o necessário para compilar.
+*
+!package.json
+!package-lock.json
+!.npmrc
+!index.html
+!vite.config.ts
+!tsconfig.json
+!postcss.config.js
+!tailwind.config.js
+!nginx.conf
+!public/
+!src/
+
+# Mesmo dentro das pastas permitidas, nunca enviar:
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/.env*
+**/*.pem
+**/*.key
+**/.DS_Store

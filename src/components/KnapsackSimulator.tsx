@@ -1,5 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { ArrowLeft, Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { clampInt } from '../utils/inputLimits';
+
+// Limites que mantêm a tabela B[k,i] (e um snapshot dela por passo) visualizável.
+const MAX_CAPACITY = 20;
+const MAX_PROFIT = 999;
 
 interface Item {
   id: number;
@@ -178,8 +183,8 @@ const KnapsackSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <h3 className="text-lg font-semibold mb-4">Configuração</h3>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Capacidade da Mochila</label>
-              <input type="number" value={capacity} onChange={(e) => setCapacity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-32 px-3 py-2 border rounded-lg" min="1" max="20" />
+              <input type="number" value={capacity} onChange={(e) => setCapacity(clampInt(e.target.value, 1, MAX_CAPACITY, 1))}
+                className="w-32 px-3 py-2 border rounded-lg" min="1" max={MAX_CAPACITY} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Itens</label>
@@ -188,12 +193,12 @@ const KnapsackSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <span className="w-20">Item {item.id}:</span>
                   <input type="number" value={item.weight} onChange={(e) => {
                     const newItems = [...items];
-                    newItems[idx].weight = Math.max(1, parseInt(e.target.value) || 1);
+                    newItems[idx].weight = clampInt(e.target.value, 1, MAX_CAPACITY, 1);
                     setItems(newItems);
                   }} className="w-20 px-2 py-1 border rounded" placeholder="Peso" />
                   <input type="number" value={item.profit} onChange={(e) => {
                     const newItems = [...items];
-                    newItems[idx].profit = Math.max(1, parseInt(e.target.value) || 1);
+                    newItems[idx].profit = clampInt(e.target.value, 1, MAX_PROFIT, 1);
                     setItems(newItems);
                   }} className="w-20 px-2 py-1 border rounded" placeholder="Lucro" />
                 </div>

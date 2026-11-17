@@ -1,31 +1,34 @@
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSimulatorConfig } from '@features/topological-sort/presentation/hooks/useSimulatorConfig';
 import { Node } from '@features/topological-sort/domain/entities/Node';
 import { Edge } from '@features/topological-sort/domain/entities/Edge';
 import { useGraph } from '../../../../../../contexts/GraphContext';
+import { convertGraphToSimulator } from '../../../../../../utils/graphConverter';
 
 // Mock the GraphContext
-jest.mock('../../../../../../contexts/GraphContext', () => ({
-  useGraph: jest.fn()
+vi.mock('../../../../../../contexts/GraphContext', () => ({
+  useGraph: vi.fn()
 }));
-jest.mock('../../../../../../utils/graphConverter', () => ({
-  convertGraphToSimulator: jest.fn()
+vi.mock('../../../../../../utils/graphConverter', () => ({
+  convertGraphToSimulator: vi.fn()
 }));
 
-const mockUseGraph = useGraph as jest.MockedFunction<typeof useGraph>;
-const { convertGraphToSimulator } = require('../../../../../../utils/graphConverter');
+const mockUseGraph = vi.mocked(useGraph);
+// Os testes devolvem objetos parciais, por isso o mock é tipado de forma ampla.
+const mockConvertGraphToSimulator = vi.mocked(convertGraphToSimulator) as unknown as Mock;
 
 describe('useSimulatorConfig', () => {
   beforeEach(() => {
     mockUseGraph.mockReturnValue({
       savedGraph: null,
-      setSavedGraph: jest.fn(),
-      clearSavedGraph: jest.fn()
+      setSavedGraph: vi.fn(),
+      clearSavedGraph: vi.fn()
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const createNode = (id: number, label: string): Node => ({
@@ -159,11 +162,11 @@ describe('useSimulatorConfig', () => {
 
     mockUseGraph.mockReturnValue({
       savedGraph: mockSavedGraph,
-      setSavedGraph: jest.fn(),
-      clearSavedGraph: jest.fn()
+      setSavedGraph: vi.fn(),
+      clearSavedGraph: vi.fn()
     });
 
-    convertGraphToSimulator.mockReturnValue({
+    mockConvertGraphToSimulator.mockReturnValue({
       nodes: [
         { id: 0, label: 'X', x: 100, y: 200 },
         { id: 1, label: 'Y', x: 200, y: 200 }
@@ -186,8 +189,8 @@ describe('useSimulatorConfig', () => {
   it('should set error when loading custom graph but no savedGraph exists', () => {
     mockUseGraph.mockReturnValue({
       savedGraph: null,
-      setSavedGraph: jest.fn(),
-      clearSavedGraph: jest.fn()
+      setSavedGraph: vi.fn(),
+      clearSavedGraph: vi.fn()
     });
 
     const { result } = renderHook(() => useSimulatorConfig({}));
@@ -203,8 +206,8 @@ describe('useSimulatorConfig', () => {
   it('should clear error when generating valid graph after error', () => {
     mockUseGraph.mockReturnValue({
       savedGraph: null,
-      setSavedGraph: jest.fn(),
-      clearSavedGraph: jest.fn()
+      setSavedGraph: vi.fn(),
+      clearSavedGraph: vi.fn()
     });
 
     const { result } = renderHook(() => useSimulatorConfig({}));

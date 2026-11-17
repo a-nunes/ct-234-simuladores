@@ -4,7 +4,7 @@ import { DijkstraSimulator } from '@features/dijkstra/presentation/components/Di
 import { GraphProvider } from '../../../../contexts/GraphContext';
 
 // Mock alert
-global.alert = jest.fn();
+global.alert = vi.fn();
 
 const renderWithProvider = (component: React.ReactElement) => {
   return render(

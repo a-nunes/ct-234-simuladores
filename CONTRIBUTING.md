@@ -55,12 +55,15 @@ git checkout -b fix/descricao-do-bug
 
 1. **Instale as dependências**
    ```bash
-   npm install
+   npm ci
    ```
+   Para adicionar uma dependência, use `npm install <pacote>`: o `.npmrc` só aceita
+   versões publicadas há 14+ dias e bloqueia scripts de instalação não revisados
+   (veja [SECURITY.md](SECURITY.md)).
 
 2. **Execute o projeto**
    ```bash
-   npm start
+   npm run dev
    ```
 
 3. **Faça suas alterações**
@@ -72,7 +75,8 @@ git checkout -b fix/descricao-do-bug
 4. **Teste suas alterações**
    ```bash
    npm test
-   npm run build
+   npm run build   # inclui o typecheck
+   npm run audit
    ```
 
 #### Commit
@@ -186,8 +190,8 @@ const Comp = (props) => {
 # Execute os testes
 npm test
 
-# Execute com cobertura
-npm test -- --coverage
+# Modo interativo
+npm run test:watch
 ```
 
 ## 📚 Documentação

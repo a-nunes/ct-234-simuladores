@@ -30,8 +30,14 @@ export const convertGraphToSimulator = (
   additionalEdgeProps: object = {}
 ): { nodes: SimulatorNode[]; edges: SimulatorEdge[] } => {
   
-  const nodes: SimulatorNode[] = graph.nodes.map(node => ({
-    id: node.id,
+  // Os simuladores indexam arrays pelo id do vértice (adjList[edge.from] etc.).
+  // No editor visual, apagar um vértice deixa "buracos" nos ids, então os ids
+  // são renumerados para 0..n-1 e arestas com extremidades inexistentes são descartadas.
+  const indexById = new Map<number, number>();
+  graph.nodes.forEach((node, index) => indexById.set(node.id, index));
+
+  const nodes: SimulatorNode[] = graph.nodes.map((node, index) => ({
+    id: index,
     label: node.label,
     state: 'unvisited',
     expl: 0,
@@ -41,14 +47,20 @@ export const convertGraphToSimulator = (
     ...additionalNodeProps
   }));
 
-  const edges: SimulatorEdge[] = graph.edges.map(edge => ({
-    from: edge.from,
-    to: edge.to,
-    type: 'none',
-    highlighted: false,
-    weight: edge.weight,
-    ...additionalEdgeProps
-  }));
+  const edges: SimulatorEdge[] = [];
+  for (const edge of graph.edges) {
+    const from = indexById.get(edge.from);
+    const to = indexById.get(edge.to);
+    if (from === undefined || to === undefined) continue;
+    edges.push({
+      from,
+      to,
+      type: 'none',
+      highlighted: false,
+      weight: edge.weight,
+      ...additionalEdgeProps
+    });
+  }
 
   return { nodes, edges };
 };

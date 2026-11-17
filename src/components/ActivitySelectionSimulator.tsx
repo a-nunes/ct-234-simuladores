@@ -1,5 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { ArrowLeft, Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { clampInt } from '../utils/inputLimits';
+
+const MAX_TIME = 100;
 
 interface Activity {
   id: number;
@@ -156,7 +159,9 @@ const ActivitySelectionSimulator: React.FC<{ onBack: () => void }> = ({ onBack }
   // Atualizar atividade
   const handleActivityChange = (index: number, field: 'start' | 'finish', value: string) => {
     const newActivities = [...activities];
-    const numValue = parseInt(value) || 0;
+    // O fim máximo define o tamanho da régua de tempo renderizada; sem limite,
+    // um valor como 1e9 alocava meio bilhão de elementos.
+    const numValue = clampInt(value, 0, MAX_TIME, 0);
     newActivities[index] = { ...newActivities[index], [field]: numValue };
     setActivities(newActivities);
   };
@@ -315,6 +320,7 @@ const ActivitySelectionSimulator: React.FC<{ onBack: () => void }> = ({ onBack }
                       onChange={(e) => handleActivityChange(index, 'start', e.target.value)}
                       className="w-20 px-2 py-1 border rounded"
                       min="0"
+                      max={MAX_TIME}
                     />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -325,6 +331,7 @@ const ActivitySelectionSimulator: React.FC<{ onBack: () => void }> = ({ onBack }
                       onChange={(e) => handleActivityChange(index, 'finish', e.target.value)}
                       className="w-20 px-2 py-1 border rounded"
                       min="0"
+                      max={MAX_TIME}
                     />
                   </div>
                   <button

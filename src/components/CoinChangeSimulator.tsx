@@ -1,5 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { ArrowLeft, Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { clampInt } from '../utils/inputLimits';
+
+// Moedas negativas/zero quebravam a reconstrução da solução (laço infinito).
+const MAX_COIN_VALUE = 100;
 
 interface Step {
   type: 'init' | 'process_cell' | 'test_coin' | 'update_cell' | 'complete';
@@ -173,6 +177,8 @@ const CoinChangeSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     while (remaining > 0) {
       const coin = ultima[remaining];
+      // Defesa: moeda inválida (≤ 0 ou ausente) faria o laço nunca terminar.
+      if (!(coin > 0)) break;
       const existing = result.find(r => r.coin === coin);
       if (existing) {
         existing.count++;
@@ -216,7 +222,7 @@ const CoinChangeSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   // Atualizar moedas
   const handleCoinChange = (index: number, value: string) => {
     const newCoins = [...coins];
-    newCoins[index] = parseInt(value) || 1;
+    newCoins[index] = clampInt(value, 1, MAX_COIN_VALUE, 1);
     setCoins(newCoins);
   };
 
@@ -331,7 +337,7 @@ const CoinChangeSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <input
                   type="number"
                   value={targetAmount}
-                  onChange={(e) => setTargetAmount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                  onChange={(e) => setTargetAmount(clampInt(e.target.value, 1, 100, 1))}
                   className="w-32 px-3 py-2 border rounded-lg"
                   min="1"
                   max="100"
@@ -349,6 +355,7 @@ const CoinChangeSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         onChange={(e) => handleCoinChange(index, e.target.value)}
                         className="w-24 px-2 py-1 border rounded"
                         min="1"
+                        max={MAX_COIN_VALUE}
                       />
                       <span>centavos</span>
                       <button

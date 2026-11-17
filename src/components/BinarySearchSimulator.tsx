@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Play, RotateCcw, SkipBack, SkipForward, Search } from 'lucide-react';
 
+const MAX_ARRAY_SIZE = 20;
+
 interface Step {
   type: 'init' | 'focus' | 'calculate_pivot' | 'compare' | 'go_left' | 'go_right' | 'found' | 'not_found';
   l: number;
@@ -158,6 +160,11 @@ const BinarySearchSimulator: React.FC = () => {
         alert('Array inválido! Use números separados por vírgula.');
         return;
       }
+
+      if (newArray.length > MAX_ARRAY_SIZE) {
+        alert(`Use no máximo ${MAX_ARRAY_SIZE} elementos para a visualização.`);
+        return;
+      }
       
       if (isNaN(newSearch)) {
         alert('Valor de busca inválido!');
@@ -239,6 +246,7 @@ const BinarySearchSimulator: React.FC = () => {
                 type="text"
                 value={customArray}
                 onChange={(e) => setCustomArray(e.target.value)}
+                maxLength={200}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="2,5,8,12,16,23..."
                 disabled={isRunning}

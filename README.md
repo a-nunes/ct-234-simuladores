@@ -6,9 +6,9 @@
 
 **Plataforma Interativa de Visualização de Algoritmos**
 
-[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4.18-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![React](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4.19-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 [🚀 Demo ao Vivo](#) • [📖 Documentação](docs/) • [🐛 Reportar Bug](../../issues) • [💡 Solicitar Feature](../../issues)
@@ -195,8 +195,8 @@ Crie e edite grafos de forma visual ou textual para testar nos simuladores.
 
 ### 📋 Pré-requisitos
 
-- **Node.js** >= 16.x
-- **npm** >= 8.x ou **yarn** >= 1.22
+- **Node.js** >= 22.12 (recomendado: 24 LTS)
+- **npm** >= 11 (o `.npmrc` usa `min-release-age` e `strict-allow-scripts`)
 
 ### 🔧 Instalação
 
@@ -206,24 +206,27 @@ Crie e edite grafos de forma visual ou textual para testar nos simuladores.
    cd ct-234-simuladores
    ```
 
-2. **Instale as dependências**
+2. **Instale as dependências** (exatamente as do lockfile)
    ```bash
-   npm install
+   npm ci
    ```
 
 3. **Execute o projeto em modo de desenvolvimento**
    ```bash
-   npm start
+   npm run dev
    ```
 
-   O aplicativo será aberto automaticamente em [http://localhost:3000](http://localhost:3000)
+   Acesse [http://localhost:3000](http://localhost:3000). O servidor de desenvolvimento só escuta em `127.0.0.1`.
 
 ### 📦 Scripts Disponíveis
 
-- **`npm start`** - Inicia o servidor de desenvolvimento
-- **`npm test`** - Executa os testes em modo interativo
-- **`npm run build`** - Cria build otimizado para produção
-- **`npm run eject`** - Remove a abstração do Create React App (irreversível)
+- **`npm run dev`** (ou `npm start`) - Servidor de desenvolvimento Vite
+- **`npm test`** - Executa todos os testes (Vitest) uma vez
+- **`npm run test:watch`** - Testes em modo interativo
+- **`npm run typecheck`** - Verificação de tipos (TypeScript)
+- **`npm run build`** - Typecheck + build otimizado para produção (sem source maps)
+- **`npm run preview`** - Serve o build localmente para conferência
+- **`npm run audit`** - Auditoria de vulnerabilidades das dependências
 
 ### 🏗️ Build para Produção
 
@@ -241,23 +244,21 @@ Os arquivos otimizados estarão na pasta `build/` e estarão prontos para deploy
 
 O projeto inclui configuração Docker para facilitar o deploy em servidores.
 
-### Build da Imagem
+A imagem final é um nginx **sem root** (uid 101, porta 8080) com CSP estrita e
+cabeçalhos de segurança. O jeito mais simples de rodar localmente, já com as
+restrições de produção (filesystem somente leitura, sem capabilities, limites de memória/PIDs):
 
 ```bash
-docker build -t ct-234-simuladores .
+docker compose up -d --build
 ```
 
-### Executar Container
+Acesse em [http://localhost:8080](http://localhost:8080).
 
-```bash
-docker run -p 8080:80 ct-234-simuladores
-```
+### Deploy
 
-Acesse em [http://localhost:8080](http://localhost:8080)
-
-### Deploy no Easypanel
-
-Para instruções detalhadas de deploy no Easypanel, consulte [DEPLOY.md](DEPLOY.md).
+O deploy em produção usa **Kamal** no VPS da Oracle Cloud (arm64), atrás do
+`kamal-proxy` com HTTPS automático. Veja [DEPLOY.md](DEPLOY.md). Os controles de
+segurança e os riscos aceitos estão em [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -265,8 +266,8 @@ Para instruções detalhadas de deploy no Easypanel, consulte [DEPLOY.md](DEPLOY
 
 ```
 ct-234-simuladores/
+├── index.html                  # Entry HTML (Vite)
 ├── public/                     # Arquivos públicos estáticos
-│   ├── index.html
 │   └── manifest.json
 ├── src/
 │   ├── components/             # Componentes React dos simuladores
@@ -292,9 +293,13 @@ ct-234-simuladores/
 │   ├── SIMULADORES.md
 │   ├── CUSTOM_GRAPHS.md
 │   └── bizus/
-├── Dockerfile                  # Configuração Docker
-├── nginx.conf                  # Configuração do servidor Nginx
+├── config/deploy.yml           # Configuração do Kamal (deploy)
+├── Dockerfile                  # Build multi-stage → nginx sem root
+├── compose.yaml                # Execução local endurecida
+├── nginx.conf                  # Servidor + cabeçalhos de segurança
+├── vite.config.ts              # Build e testes (Vite + Vitest)
 ├── DEPLOY.md                   # Guia de deploy
+├── SECURITY.md                 # Modelo de ameaças e controles
 ├── package.json
 └── README.md
 ```
@@ -305,9 +310,9 @@ ct-234-simuladores/
 
 ### Core
 
-- **[React](https://reactjs.org/)** `19.2.0` - Biblioteca JavaScript para construção de interfaces
-- **[TypeScript](https://www.typescriptlang.org/)** `4.9.5` - Superset tipado de JavaScript
-- **[TailwindCSS](https://tailwindcss.com/)** `3.4.18` - Framework CSS utilitário
+- **[React](https://react.dev/)** `19.3` - Biblioteca JavaScript para construção de interfaces
+- **[TypeScript](https://www.typescriptlang.org/)** `7.0` - Superset tipado de JavaScript
+- **[TailwindCSS](https://tailwindcss.com/)** `3.4.19` - Framework CSS utilitário
 
 ### UI/UX
 
@@ -316,7 +321,8 @@ ct-234-simuladores/
 
 ### Tooling
 
-- **[Create React App](https://create-react-app.dev/)** - Setup e configuração do projeto
+- **[Vite](https://vite.dev/)** `8` - Build e servidor de desenvolvimento
+- **[Vitest](https://vitest.dev/)** `5` + Testing Library - Testes
 - **[PostCSS](https://postcss.org/)** - Transformação de CSS
 - **[Docker](https://www.docker.com/)** - Containerização
 - **[Nginx](https://nginx.org/)** - Servidor web para produção

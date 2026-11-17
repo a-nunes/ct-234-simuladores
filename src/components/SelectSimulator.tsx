@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Play, RotateCcw, SkipBack, SkipForward, Target } from 'lucide-react';
 
+const MAX_ARRAY_SIZE = 20;
+
 interface Step {
   type: 'init' | 'divide_groups' | 'find_medians' | 'find_pivot' | 'partition' | 'count_smaller' | 'recurse_left' | 'recurse_right' | 'found' | 'result';
   V: number[];
@@ -245,6 +247,11 @@ const SelectSimulator: React.FC = () => {
         return;
       }
 
+      if (newArray.length > MAX_ARRAY_SIZE) {
+        alert(`Use no máximo ${MAX_ARRAY_SIZE} elementos para a visualização.`);
+        return;
+      }
+
       if (isNaN(newK) || newK < 1 || newK > newArray.length) {
         alert(`k deve estar entre 1 e ${newArray.length}!`);
         return;
@@ -306,6 +313,7 @@ const SelectSimulator: React.FC = () => {
                 type="text"
                 value={customArray}
                 onChange={(e) => setCustomArray(e.target.value)}
+                maxLength={200}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="3,7,1,9,4,12..."
                 disabled={isRunning}

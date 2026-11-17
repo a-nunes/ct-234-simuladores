@@ -1,238 +1,94 @@
-# Deploy no Easypanel
+# Deploy na Oracle Cloud (Kamal)
 
-Este guia mostra como fazer o deploy da aplicação React no Easypanel usando Docker.
+A aplicação é um site estático servido por um nginx **sem root** dentro de um
+container. Em produção ela roda no VPS da OCI (Ampere A1, **arm64**) com
+[Kamal 2](https://kamal-deploy.org/), atrás do `kamal-proxy`, que já ocupa as
+portas 80/443 do servidor, emite os certificados Let's Encrypt e roteia por
+domínio. É o mesmo arranjo dos outros apps do servidor.
+
+```
+Internet ──443/TLS──▶ kamal-proxy ──HTTP:8080 (rede docker "kamal")──▶ ct234_simuladores (nginx, uid 101)
+```
 
 ## Pré-requisitos
 
-- Conta no Easypanel configurada
-- Acesso à sua VPS
-- Repositório Git (GitHub, GitLab, etc.) com o código
+- Kamal 2 instalado localmente (`kamal version`).
+- Acesso SSH ao VPS com chave (usuário `ubuntu`).
+- Um subdomínio com registro **A** apontando para o IP público do VPS
+  (ex.: `ct234.seu-dominio`). O Let's Encrypt só emite o certificado depois que o DNS propagar.
+- O Kamal faz o build a partir do **último commit** (git), então faça commit antes.
 
-## Opção 1: Deploy via Git (Recomendado)
+## Configuração
 
-### 1. Preparar o Repositório
+Tudo está em [`config/deploy.yml`](config/deploy.yml). IP e domínio **não** ficam
+no repositório; eles vêm de variáveis de ambiente:
 
-Certifique-se de que todos os arquivos necessários estão commitados:
+| Variável         | Obrigatória | Exemplo             |
+|------------------|-------------|---------------------|
+| `CT234_HOST`     | sim         | `ct234.seu-dominio` |
+| `CT234_SERVER`   | sim         | IP público do VPS   |
+| `CT234_SSH_USER` | não         | `ubuntu` (padrão)   |
 
-```bash
-git add .
-git commit -m "Add Docker configuration"
-git push
-```
+O registry é o mesmo **registry local** do Kamal usado pelos outros apps
+(`localhost:5555`, tunelado por SSH), então não há credenciais de registry.
 
-### 2. Criar Aplicação no Easypanel
-
-1. Acesse o painel do Easypanel
-2. Clique em **"Create Application"** ou **"New App"**
-3. Escolha **"Deploy from GitHub"** (ou seu provedor Git)
-4. Selecione o repositório do projeto
-5. Configure as seguintes opções:
-
-**Build Settings:**
-- Build Method: `Dockerfile`
-- Dockerfile Path: `./Dockerfile` (padrão)
-- Build Context: `./` (padrão)
-
-**Port Configuration:**
-- Container Port: `80`
-- Public Port: `80` ou `443` (se usar HTTPS)
-
-**Environment Variables:**
-Não é necessário adicionar variáveis de ambiente, a menos que você tenha configurações específicas.
-
-### 3. Deploy
-
-1. Clique em **"Deploy"**
-2. Aguarde o build e deploy completarem
-3. O Easypanel fornecerá uma URL para acessar sua aplicação
-
-### 4. Configurar Domínio (Opcional)
-
-1. No painel da aplicação, vá em **"Domains"**
-2. Adicione seu domínio customizado
-3. Configure o DNS do seu domínio para apontar para o IP da VPS
-4. O Easypanel pode configurar SSL/HTTPS automaticamente
-
-## Opção 2: Deploy Manual via Docker
-
-Se preferir fazer deploy manual:
-
-### 1. Build da Imagem
+## Primeiro deploy
 
 ```bash
-# Na pasta do projeto
-docker build -t ct-234-simuladores .
+export CT234_HOST=ct234.seu-dominio
+export CT234_SERVER=<ip-do-vps>
+
+kamal config     # valida a configuração localmente, sem tocar no servidor
+kamal deploy     # build arm64, push, sobe o container e registra no kamal-proxy
 ```
 
-### 2. Testar Localmente
+> O `kamal-proxy` e a rede `kamal` já existem no servidor, por isso `kamal deploy`
+> basta. Num servidor novo, use `kamal setup`.
+
+O build da imagem roda a etapa Node na arquitetura da sua máquina (sem emulação)
+e só o estágio final é arm64. O único passo emulado é o `apk upgrade` (alguns segundos).
+
+## Verificação pós-deploy
 
 ```bash
-docker run -p 8080:80 ct-234-simuladores
+curl -sI https://$CT234_HOST/ | grep -iE 'HTTP/|content-security|strict-transport|x-frame'
+curl -s  https://$CT234_HOST/healthz            # → ok
+curl -s -o /dev/null -w '%{http_code}\n' https://$CT234_HOST/.env   # → 404
+kamal app details
+kamal logs
 ```
 
-Acesse `http://localhost:8080` para verificar se está funcionando.
+Se o certificado demorar, confira o DNS (`dig +short $CT234_HOST`) e os logs do proxy
+(`kamal proxy logs`).
 
-### 3. Push para Registry
+## Operação
+
+| Ação              | Comando                         |
+|-------------------|---------------------------------|
+| Novo deploy       | `kamal deploy`                  |
+| Voltar versão     | `kamal rollback <versão>`       |
+| Logs              | `kamal logs`                    |
+| Parar / remover   | `kamal app stop` / `kamal remove` |
+
+## Restrições do container em produção
+
+Definidas em `servers.web.options` do `config/deploy.yml` (as mesmas do `compose.yaml`):
+
+- filesystem raiz **somente leitura**; só `/tmp` é gravável (tmpfs `noexec,nosuid,nodev`);
+- `--cap-drop ALL` e `no-new-privileges`;
+- processo nginx como **uid 101** (sem root);
+- limites de **64 MB** de RAM, **0,5** CPU e **64** PIDs (uso real: ~8 MB);
+- sem portas publicadas no host: só o `kamal-proxy` alcança o container.
+
+## Execução local
 
 ```bash
-# Tag a imagem
-docker tag ct-234-simuladores seu-usuario/ct-234-simuladores:latest
-
-# Push para Docker Hub (ou seu registry)
-docker push seu-usuario/ct-234-simuladores:latest
+docker compose up -d --build     # http://localhost:8080 (só em 127.0.0.1)
+docker compose down
 ```
 
-### 4. Deploy no Easypanel
-
-1. No Easypanel, crie uma nova aplicação
-2. Escolha **"Deploy from Docker Registry"**
-3. Informe: `seu-usuario/ct-234-simuladores:latest`
-4. Configure a porta: `80`
-5. Faça o deploy
-
-## Configurações Avançadas
-
-### Variáveis de Ambiente
-
-Se precisar adicionar variáveis de ambiente para a aplicação React, você pode fazer isso de duas formas:
-
-**1. Durante o build (recomendado para React):**
-
-Adicione um arquivo `.env.production` na raiz do projeto:
-
-```env
-REACT_APP_API_URL=https://sua-api.com
-REACT_APP_ENV=production
-```
-
-**2. No Easypanel:**
-
-Vá em **"Environment Variables"** e adicione as variáveis necessárias.
-
-**Importante:** Variáveis React devem começar com `REACT_APP_` para serem incluídas no build.
-
-### Resources (CPU/Memória)
-
-Configurações recomendadas no Easypanel:
-
-- **Memory:** 512MB - 1GB
-- **CPU:** 0.5 - 1 vCPU
-
-Ajuste conforme a necessidade e tamanho da aplicação.
-
-### Logs
-
-Para visualizar logs da aplicação:
-
-1. No Easypanel, vá na sua aplicação
-2. Clique em **"Logs"**
-3. Você verá os logs do Nginx e do container
-
-### Health Checks
-
-O Easypanel pode configurar health checks automaticamente. Se precisar customizar:
-
-- **Health Check Path:** `/`
-- **Port:** `80`
-- **Interval:** `30s`
-
-## Troubleshooting
-
-### Build falha
-
-1. Verifique se o `Dockerfile` está na raiz do projeto
-2. Confira os logs de build no Easypanel
-3. Teste o build localmente primeiro
-
-### Aplicação não carrega
-
-1. Verifique se a porta está correta (80)
-2. Confira os logs da aplicação
-3. Teste se o container funciona localmente
-
-### Erro 404 ao navegar
-
-Se você usa React Router e recebe erro 404 ao acessar rotas diretamente:
-
-1. O arquivo `nginx.conf` já inclui a configuração necessária
-2. Verifique se o arquivo está sendo copiado corretamente no Dockerfile
-
-### Rebuild/Redeploy
-
-Para fazer redeploy após mudanças:
-
-1. Faça commit e push das alterações
-2. No Easypanel, clique em **"Rebuild"** ou **"Redeploy"**
-3. Ou configure **Auto Deploy** para deploy automático em cada push
-
-## Otimizações
-
-### Cache de Layers
-
-O Dockerfile já está otimizado para cache de layers do Docker:
-- Dependências são instaladas antes de copiar o código fonte
-- Isso acelera builds subsequentes
-
-### Compressão
-
-O nginx.conf já inclui compressão gzip para assets.
-
-### Build Performance
-
-Se o build estiver lento, você pode:
-
-1. Usar `npm ci` em vez de `npm install` (já configurado)
-2. Configurar cache de build no Easypanel (se disponível)
-3. Otimizar dependências removendo pacotes não utilizados
-
-## Segurança
-
-### HTTPS
-
-O Easypanel geralmente fornece HTTPS automático via Let's Encrypt. Se não:
-
-1. Vá em **"Domains"**
-2. Ative **"Enable SSL"**
-
-### Headers de Segurança
-
-O `nginx.conf` já inclui headers de segurança básicos:
-- X-Frame-Options
-- X-Content-Type-Options
-- X-XSS-Protection
-
-## Monitoramento
-
-No painel do Easypanel você pode monitorar:
-
-- CPU e memória utilizados
-- Status da aplicação
-- Logs em tempo real
-- Uptime
-
-## Suporte
-
-Para problemas específicos do Easypanel, consulte:
-- [Documentação oficial do Easypanel](https://easypanel.io/docs)
-- Comunidade Discord do Easypanel
-
----
-
-## Resumo Rápido
+Para testar exatamente a imagem arm64 do servidor:
 
 ```bash
-# 1. Commit e push do código
-git add .
-git commit -m "Add Docker configuration"
-git push
-
-# 2. No Easypanel:
-# - Create Application
-# - Deploy from GitHub
-# - Select repository
-# - Deploy method: Dockerfile
-# - Port: 80
-# - Deploy!
+docker buildx build --platform linux/arm64 -t ct-234-simuladores:arm64 --load .
 ```
-
-Pronto! Sua aplicação estará no ar. 🚀
