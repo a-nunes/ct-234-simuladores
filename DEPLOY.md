@@ -25,8 +25,7 @@ Cloudflare) e o Cloudflare valida esse certificado (modo *Full (strict)* para o 
 - Um subdomínio no Cloudflare com registro **A** *proxied* apontando para o IP público do VPS.
 - O certificado Origin CA e a chave em `~/.config/ct234/origin-cert.pem` e
   `~/.config/ct234/origin-key.pem` (permissão 600, **fora do repositório**).
-  O `.kamal/secrets` só lê esses arquivos; caminhos alternativos via
-  `CT234_ORIGIN_CERT` / `CT234_ORIGIN_KEY`.
+  O `.kamal/secrets` só lê esses arquivos.
 - O Kamal faz o build a partir do **último commit** (git), então faça commit antes.
 
 ## Configuração
