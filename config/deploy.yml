@@ -31,13 +31,10 @@ servers:
 proxy:
   host: <%= app_host %>
   app_port: 8080
-  # O registro DNS fica "proxied" no Cloudflare, que termina o TLS público. O
-  # Let's Encrypt do kamal-proxy (desafio TLS-ALPN na 443) não funciona atrás
-  # do proxy, então a origem usa um certificado Cloudflare Origin CA, com o
-  # modo SSL "Full (strict)" no Cloudflare. Os PEMs vêm de .kamal/secrets.
-  ssl:
-    certificate_pem: CT234_ORIGIN_CERT_PEM
-    private_key_pem: CT234_ORIGIN_KEY_PEM
+  # Registro DNS-only (sem proxy do Cloudflare): o kamal-proxy obtém e renova
+  # o certificado Let's Encrypt (desafio TLS-ALPN na 443). Se o proxy do
+  # Cloudflare for religado, o Let's Encrypt deixa de validar: veja DEPLOY.md.
+  ssl: true
   # Com ssl ativo o kamal-proxy deixa de repassar X-Forwarded-*; o nginx usa
   # X-Forwarded-Proto para emitir o HSTS e X-Forwarded-For nos logs.
   forward_headers: true
