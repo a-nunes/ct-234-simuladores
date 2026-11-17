@@ -2,20 +2,31 @@
 
 A aplicação é um site estático servido por um nginx **sem root** dentro de um
 container. Em produção ela roda no VPS da OCI (Ampere A1, **arm64**) com
-[Kamal 2](https://kamal-deploy.org/), atrás do `kamal-proxy`, que já ocupa as
-portas 80/443 do servidor, emite os certificados Let's Encrypt e roteia por
-domínio. É o mesmo arranjo dos outros apps do servidor.
+[Kamal 2](https://kamal-deploy.org/), atrás do `kamal-proxy`, que ocupa as
+portas 80/443 do servidor e roteia por domínio. O registro DNS fica **proxied**
+no Cloudflare:
 
 ```
-Internet ──443/TLS──▶ kamal-proxy ──HTTP:8080 (rede docker "kamal")──▶ ct234_simuladores (nginx, uid 101)
+Navegador ──TLS (cert. do Cloudflare)──▶ Cloudflare ──TLS (Origin CA, Full strict)──▶ kamal-proxy ──HTTP:8080──▶ nginx (uid 101)
 ```
+
+### Por que Origin CA e não Let's Encrypt
+
+O Let's Encrypt do `kamal-proxy` valida pelo desafio TLS-ALPN na porta 443 da
+origem. Com o proxy do Cloudflare ligado, quem termina o TLS é o Cloudflare, e o
+desafio falha (na emissão e nas renovações). Por isso a origem usa um
+certificado **Cloudflare Origin CA** (válido por 15 anos, aceito só pelo
+Cloudflare) e o Cloudflare valida esse certificado (modo *Full (strict)* para o host).
 
 ## Pré-requisitos
 
 - Kamal 2 instalado localmente (`kamal version`).
 - Acesso SSH ao VPS com chave (usuário `ubuntu`).
-- Um subdomínio com registro **A** apontando para o IP público do VPS
-  (ex.: `ct234.seu-dominio`). O Let's Encrypt só emite o certificado depois que o DNS propagar.
+- Um subdomínio no Cloudflare com registro **A** *proxied* apontando para o IP público do VPS.
+- O certificado Origin CA e a chave em `~/.config/ct234/origin-cert.pem` e
+  `~/.config/ct234/origin-key.pem` (permissão 600, **fora do repositório**).
+  O `.kamal/secrets` só lê esses arquivos; caminhos alternativos via
+  `CT234_ORIGIN_CERT` / `CT234_ORIGIN_KEY`.
 - O Kamal faz o build a partir do **último commit** (git), então faça commit antes.
 
 ## Configuração
