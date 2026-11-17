@@ -490,7 +490,7 @@ __tests__/
 
 ### 6.2 Estratégia de Testes
 
-**Unit Tests (Jest puro):**
+**Unit Tests (Vitest puro):**
 - Domain: Use cases, entidades
 - Data: Algoritmos, validators, step generators
 - Presentation: Hooks individuais
@@ -547,31 +547,33 @@ describe('useStepNavigation', () => {
 ```json
 {
   "compilerOptions": {
-    "baseUrl": "src",
+    "moduleResolution": "bundler",
     "paths": {
-      "@features/*": ["features/*"]
+      "@features/*": ["./src/features/*"],
+      "@shared/*": ["./src/shared/*"]
     }
   }
 }
 ```
 
-### 7.2 Jest (package.json)
+### 7.2 Vite / Vitest (vite.config.ts)
 
-```json
-{
-  "jest": {
-    "moduleNameMapper": {
-      "^@features/(.*)$": "<rootDir>/src/features/$1"
-    }
-  }
-}
+Os aliases ficam em `resolve.alias` do `vite.config.ts` e valem para build e testes:
+
+```typescript
+resolve: {
+  alias: {
+    '@features': r('./src/features'),
+    '@shared': r('./src/shared'),
+  },
+},
 ```
 
 ### 7.3 Imports
 
 **Regra Principal:** Use **SEMPRE** path aliases `@features/*` e `@shared/*` para imports entre camadas ou features. Imports relativos (`./` ou `../`) são permitidos APENAS dentro da mesma pasta/módulo.
 
-**Aliases Disponíveis (craco.config.js):**
+**Aliases Disponíveis (vite.config.ts + tsconfig.json):**
 - `@features/*` → `src/features/*`
 - `@shared/*` → `src/shared/*`
 
@@ -807,7 +809,7 @@ export const Simulator = () => {
 ### 11.4 Imports
 
 - ✅ Use path aliases `@features/*` em código
-- ✅ Use path aliases em testes (Jest configurado)
+- ✅ Use path aliases em testes (Vitest configurado)
 - ✅ Mantenha imports absolutos consistentes
 
 ---

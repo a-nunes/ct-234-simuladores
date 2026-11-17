@@ -4,7 +4,7 @@ import { PrimSimulator } from '@features/prim/presentation/components/PrimSimula
 import { GraphProvider } from '../../../../contexts/GraphContext';
 
 // Mock alert
-global.alert = jest.fn();
+global.alert = vi.fn();
 
 const renderWithProvider = (component: React.ReactElement) => {
   return render(

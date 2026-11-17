@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BinarySearchSimulator } from '@features/binary-search/presentation/components/BinarySearchSimulator';
 
 // Mock alert
-global.alert = jest.fn();
+global.alert = vi.fn();
 
 describe('BinarySearchSimulator Integration', () => {
   it('should render with default configuration', () => {

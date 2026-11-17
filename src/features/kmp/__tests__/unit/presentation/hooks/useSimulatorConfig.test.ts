@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSimulatorConfig } from '@features/kmp/presentation/hooks/useSimulatorConfig';
 

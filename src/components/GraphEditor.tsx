@@ -12,6 +12,17 @@ import {
   Book
 } from 'lucide-react';
 
+import { clampText } from '../utils/inputLimits';
+
+// Limites do editor: mantêm os simuladores visualizáveis e evitam travar a aba
+// com grafos gigantes (cada passo dos simuladores copia todos os nós/arestas).
+export const MAX_GRAPH_NODES = 26;
+export const MAX_GRAPH_EDGES = 200;
+export const MAX_LABEL_LENGTH = 8;
+export const MAX_GRAPH_TEXT_LENGTH = 4000;
+
+class GraphTextError extends Error {}
+
 export type GraphType = 'directed' | 'undirected';
 export type WeightType = 'unweighted' | 'weighted';
 
@@ -64,6 +75,7 @@ const GraphEditor: React.FC<Props> = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   
   const [textInput, setTextInput] = useState('');
+  const [textError, setTextError] = useState<string | null>(null);
   const [showTextEditor, setShowTextEditor] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   
@@ -139,7 +151,7 @@ const GraphEditor: React.FC<Props> = ({
 
   // Converte texto para grafo
   const textToGraph = useCallback((text: string) => {
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = clampText(text, MAX_GRAPH_TEXT_LENGTH).split('\n').map(l => l.trim()).filter(Boolean);
     const newNodes: GraphNode[] = [];
     const newEdges: GraphEdge[] = [];
     const nodeMap = new Map<string, number>();
@@ -150,6 +162,12 @@ const GraphEditor: React.FC<Props> = ({
     const getOrCreateNode = (label: string): number => {
       if (nodeMap.has(label)) {
         return nodeMap.get(label)!;
+      }
+      if (label.length === 0 || label.length > MAX_LABEL_LENGTH) {
+        throw new GraphTextError(`Rótulo inválido "${label.slice(0, 20)}": use de 1 a ${MAX_LABEL_LENGTH} caracteres.`);
+      }
+      if (currentId >= MAX_GRAPH_NODES) {
+        throw new GraphTextError(`O grafo pode ter no máximo ${MAX_GRAPH_NODES} vértices.`);
       }
       
       const id = currentId++;
@@ -163,6 +181,7 @@ const GraphEditor: React.FC<Props> = ({
       return id;
     };
     
+    try {
     lines.forEach(line => {
       // Remove espaços extras
       line = line.replace(/\s+/g, ' ');
@@ -197,6 +216,9 @@ const GraphEditor: React.FC<Props> = ({
         }
         
         const toId = getOrCreateNode(toLabel);
+        if (newEdges.length >= MAX_GRAPH_EDGES) {
+          throw new GraphTextError(`O grafo pode ter no máximo ${MAX_GRAPH_EDGES} arestas.`);
+        }
         newEdges.push({ from: fromId, to: toId, weight });
         
         // Se não-direcionado, adiciona aresta reversa
@@ -206,6 +228,15 @@ const GraphEditor: React.FC<Props> = ({
       });
     });
     
+    } catch (err) {
+      if (err instanceof GraphTextError) {
+        setTextError(err.message);
+        return;
+      }
+      throw err;
+    }
+
+    setTextError(null);
     setNodes(newNodes);
     setEdges(newEdges);
     nextNodeId.current = currentId;
@@ -221,6 +252,7 @@ const GraphEditor: React.FC<Props> = ({
     const y = e.clientY - rect.top;
     
     if (toolMode === 'add-node') {
+      if (nodes.length >= MAX_GRAPH_NODES) return;
       const label = getNextLabel();
       const newNode: GraphNode = {
         id: nextNodeId.current++,
@@ -634,11 +666,16 @@ const GraphEditor: React.FC<Props> = ({
             
             <textarea
               value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
+              onChange={(e) => setTextInput(clampText(e.target.value, MAX_GRAPH_TEXT_LENGTH))}
+              maxLength={MAX_GRAPH_TEXT_LENGTH}
               placeholder={`Exemplo:\nA ${graphType === 'directed' ? '->' : '-'} B, C\nB ${graphType === 'directed' ? '->' : '-'} D\nD`}
               className="w-full h-64 px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none font-mono text-sm"
             />
             
+            {textError && (
+              <p role="alert" className="mt-2 text-sm text-red-700">{textError}</p>
+            )}
+
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowTextEditor(false)}

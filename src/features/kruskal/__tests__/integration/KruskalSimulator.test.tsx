@@ -4,7 +4,7 @@ import { KruskalSimulator } from '@features/kruskal/presentation/components/Krus
 import { GraphProvider } from '../../../../contexts/GraphContext';
 
 // Mock alert
-global.alert = jest.fn();
+global.alert = vi.fn();
 
 const renderWithProvider = (component: React.ReactElement) => {
   return render(

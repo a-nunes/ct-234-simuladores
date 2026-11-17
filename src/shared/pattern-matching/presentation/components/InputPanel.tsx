@@ -1,5 +1,9 @@
 import React from 'react';
 
+// Limites de visualização (cada passo renderiza texto e padrão inteiros).
+const MAX_TEXT_LENGTH = 60;
+const MAX_PATTERN_LENGTH = 20;
+
 export interface InputPanelProps {
   text: string;
   pattern: string;
@@ -35,6 +39,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           type="text"
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
+          maxLength={MAX_TEXT_LENGTH}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Digite o texto"
         />
@@ -48,6 +53,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           type="text"
           value={pattern}
           onChange={(e) => onPatternChange(e.target.value)}
+          maxLength={MAX_PATTERN_LENGTH}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Digite o padrão"
         />

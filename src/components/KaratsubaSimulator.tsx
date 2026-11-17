@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Play, RotateCcw, SkipBack, SkipForward, Calculator } from 'lucide-react';
 
+const MAX_KARATSUBA_VALUE = 99_999_999;
+
 interface Step {
   type: 'init' | 'divide' | 'calc_x' | 'calc_y' | 'calc_z_temp' | 'calc_z' | 'combine' | 'result';
   I: number;
@@ -289,6 +291,12 @@ const KaratsubaSimulator: React.FC = () => {
 
       if (n1 < 0 || n2 < 0) {
         alert('Use apenas números não-negativos!');
+        return;
+      }
+
+      // Acima disso a multiplicação perde precisão em double (2^53) e a árvore fica ilegível.
+      if (n1 > MAX_KARATSUBA_VALUE || n2 > MAX_KARATSUBA_VALUE) {
+        alert(`Use números de até ${String(MAX_KARATSUBA_VALUE).length} dígitos.`);
         return;
       }
 

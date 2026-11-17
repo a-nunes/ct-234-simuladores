@@ -67,7 +67,7 @@ src/features/{feature-name}/
 - Validação de erros customizados
 - Type guards (se houver)
 
-**Ferramentas:** Jest puro (sem React)
+**Ferramentas:** Vitest puro (sem React)
 
 **Exemplo:**
 
@@ -111,7 +111,7 @@ describe('GenerateStepsUseCase', () => {
 - Geradores de steps (conversão de execução em visualização)
 - Validadores (validação de inputs)
 
-**Ferramentas:** Jest puro (sem React)
+**Ferramentas:** Vitest puro (sem React)
 
 **Exemplo - Algoritmo:**
 
@@ -222,7 +222,7 @@ describe('StepGenerator', () => {
 - Hooks de geração (generateSteps, clearSteps, error handling)
 - Hook orquestrador (composição e ações)
 
-**Ferramentas:** Jest + React Testing Library (`@testing-library/react`)
+**Ferramentas:** Vitest + React Testing Library (`@testing-library/react`)
 
 **Exemplo - Hook de Navegação:**
 
@@ -427,7 +427,7 @@ describe('useStepGenerator', () => {
 - Interação usuário → UI → hooks → use case → data
 - Cenários reais de uso
 
-**Ferramentas:** Jest + React Testing Library
+**Ferramentas:** Vitest + React Testing Library
 
 **Exemplo:**
 
@@ -507,35 +507,54 @@ describe('Simulator Integration', () => {
 
 ## 4. Configuração do Projeto
 
-### 4.1 Jest Configuration (craco.config.js)
+### 4.1 Vitest Configuration (vite.config.ts)
 
-```javascript
-module.exports = {
-  jest: {
-    configure: {
-      moduleNameMapper: {
-        '^@features/(.*)$': '<rootDir>/src/features/$1',
-        '^@shared/(.*)$': '<rootDir>/src/shared/$1'
-      }
-    }
-  }
-};
+Os aliases `@features` e `@shared` são definidos uma única vez em `resolve.alias`
+e valem para o build e para os testes.
+
+```typescript
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@features': r('./src/features'),
+      '@shared': r('./src/shared'),
+    },
+  },
+  test: {
+    globals: true,          // describe/it/expect/vi sem import
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTests.ts'],
+    mockReset: true,        // equivalente ao resetMocks do antigo CRA/Jest
+  },
+});
 ```
 
 ### 4.2 Setup File (setupTests.ts)
 
 ```typescript
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 ```
 
-### 4.3 Scripts (package.json)
+### 4.3 Mocks
+
+Use `vi` (não `jest`). `vi.mock` é içado para o topo do arquivo, então importe o
+módulo mockado normalmente e tipifique com `vi.mocked`:
+
+```typescript
+import { useGraph } from '../../contexts/GraphContext';
+
+vi.mock('../../contexts/GraphContext', () => ({ useGraph: vi.fn() }));
+
+const mockUseGraph = vi.mocked(useGraph);
+```
+
+### 4.4 Scripts (package.json)
 
 ```json
 {
   "scripts": {
-    "test": "craco test",
-    "test:coverage": "craco test --coverage --watchAll=false",
-    "test:ci": "craco test --watchAll=false"
+    "test": "vitest run",
+    "test:watch": "vitest"
   }
 }
 ```
@@ -708,29 +727,26 @@ it('should render correctly', () => {
 npm test
 
 # Rodar em modo watch (desenvolvimento)
-npm test -- --watch
+npm run test:watch
 
-# Rodar testes de uma feature específica
-npm test -- --testPathPattern="features/kmp"
+# Rodar testes de uma feature específica (filtro por caminho)
+npx vitest run src/features/kmp
 
-# Rodar com coverage
-npm test -- --coverage --watchAll=false
-
-# Rodar testes que matcham um padrão
-npm test -- --testNamePattern="should find"
+# Rodar testes cujo nome casa com um padrão
+npx vitest run -t "should find"
 
 # Rodar um arquivo específico
-npm test -- src/features/kmp/__tests__/unit/data/algorithms/KMPAlgorithm.test.ts
+npx vitest run src/features/kmp/__tests__/unit/data/algorithms/KMPAlgorithm.test.ts
 ```
 
 ### 9.2 Debug de Testes
 
 ```bash
-# Rodar com verbose
-npm test -- --verbose
+# Saída detalhada
+npx vitest run --reporter=verbose
 
-# Rodar apenas testes que falharam
-npm test -- --onlyFailures
+# Reexecutar só os que falharam (no modo watch, tecla "f")
+npm run test:watch
 ```
 
 ---
@@ -746,7 +762,7 @@ npm test -- --onlyFailures
 
 ### 10.2 Documentação Externa
 
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
+- [Vitest Documentation](https://vitest.dev/guide/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - [Testing Library Queries](https://testing-library.com/docs/queries/about)
 

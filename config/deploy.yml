@@ -1,0 +1,69 @@
+# Deploy com Kamal 2 no VPS (OCI Ampere A1, arm64), atrás do kamal-proxy,
+# que termina o TLS (Let's Encrypt) e repassa para o nginx do container na 8080.
+#
+# Uso (veja DEPLOY.md):
+#   CT234_HOST=ct234.seu-dominio CT234_SERVER=<ip-do-vps> kamal setup    # 1ª vez
+#   CT234_HOST=ct234.seu-dominio CT234_SERVER=<ip-do-vps> kamal deploy
+#
+# IP e domínio vêm de variáveis de ambiente para não ficarem versionados.
+<%
+  app_host  = ENV.fetch("CT234_HOST")
+  server_ip = ENV.fetch("CT234_SERVER")
+  ssh_user  = ENV.fetch("CT234_SSH_USER", "ubuntu")
+%>
+service: ct234_simuladores
+image: ct234_simuladores
+
+servers:
+  web:
+    hosts:
+      - <%= server_ip %>
+    # Mesmas restrições testadas localmente (compose.yaml).
+    options:
+      read-only: true
+      tmpfs: /tmp:size=16m,mode=1777,noexec,nosuid,nodev
+      cap-drop: ALL
+      security-opt: no-new-privileges:true
+      pids-limit: 64
+      memory: 64m
+      cpus: 0.5
+
+proxy:
+  host: <%= app_host %>
+  app_port: 8080
+  # Registro DNS-only (sem proxy do Cloudflare): o kamal-proxy obtém e renova
+  # o certificado Let's Encrypt (desafio TLS-ALPN na 443). Se o proxy do
+  # Cloudflare for religado, o Let's Encrypt deixa de validar: veja DEPLOY.md.
+  ssl: true
+  # Com ssl ativo o kamal-proxy deixa de repassar X-Forwarded-*; o nginx usa
+  # X-Forwarded-Proto para emitir o HSTS e X-Forwarded-For nos logs.
+  forward_headers: true
+  healthcheck:
+    path: /healthz
+    interval: 3
+    timeout: 3
+  buffering:
+    requests: true
+    responses: true
+    # Site estático: nenhuma requisição legítima tem corpo.
+    max_request_body: 65_536
+
+registry:
+  server: localhost:5555
+
+builder:
+  arch: arm64
+
+logging:
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+ssh:
+  user: <%= ssh_user %>
+
+deploy_timeout: 60
+
+aliases:
+  logs: app logs -f

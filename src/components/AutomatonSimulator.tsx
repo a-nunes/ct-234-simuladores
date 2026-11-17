@@ -1,6 +1,10 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Play, RotateCcw, ChevronRight, ChevronLeft, FastForward } from 'lucide-react';
+import { clampText } from '../utils/inputLimits';
+
+const MAX_PATTERN_LENGTH = 20;
+const MAX_ALPHABET_SIZE = 10;
 
 const AutomatonSimulator = () => {
   const [pattern, setPattern] = useState('ababaca');
@@ -195,7 +199,12 @@ const AutomatonSimulator = () => {
   };
 
   const updateAlphabet = () => {
-    const newAlpha = customAlphabet.split(',').map(c => c.trim()).filter(c => c.length > 0);
+    // Só símbolos de 1 caractere, sem repetição, no máximo MAX_ALPHABET_SIZE.
+    // Entradas como "__proto__" viravam chaves de objeto e derrubavam a renderização.
+    const newAlpha = Array.from(
+      new Set(customAlphabet.split(',').map(c => c.trim()).filter(c => c.length === 1))
+    ).slice(0, MAX_ALPHABET_SIZE);
+    if (newAlpha.length === 0) return;
     setAlphabet(newAlpha);
   };
 
@@ -227,7 +236,8 @@ const AutomatonSimulator = () => {
             <input
               type="text"
               value={pattern}
-              onChange={(e) => setPattern(e.target.value)}
+              onChange={(e) => setPattern(clampText(e.target.value, MAX_PATTERN_LENGTH))}
+              maxLength={MAX_PATTERN_LENGTH}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
               placeholder="Ex: ababaca"
             />

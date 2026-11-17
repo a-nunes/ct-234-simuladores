@@ -1,5 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { ArrowLeft, Play, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { clampText } from '../utils/inputLimits';
+
+// Cada passo copia as duas tabelas (m+1)×(n+1); strings longas esgotam a memória.
+const MAX_LCS_LENGTH = 12;
 
 type Direction = 'DIAGONAL' | 'CIMA' | 'ESQUERDA' | null;
 
@@ -306,7 +310,8 @@ const LCSSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <input
                   type="text"
                   value={stringX}
-                  onChange={(e) => setStringX(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
+                  onChange={(e) => setStringX(clampText(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''), MAX_LCS_LENGTH))}
+                  maxLength={MAX_LCS_LENGTH}
                   className="w-full px-3 py-2 border rounded-lg font-mono"
                   placeholder="ABCBDAB"
                 />
@@ -316,7 +321,8 @@ const LCSSimulator: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <input
                   type="text"
                   value={stringY}
-                  onChange={(e) => setStringY(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
+                  onChange={(e) => setStringY(clampText(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''), MAX_LCS_LENGTH))}
+                  maxLength={MAX_LCS_LENGTH}
                   className="w-full px-3 py-2 border rounded-lg font-mono"
                   placeholder="BDCABA"
                 />

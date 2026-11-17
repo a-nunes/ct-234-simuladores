@@ -1,8 +1,9 @@
+import type { Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSimulatorConfig } from '@features/binary-search/presentation/hooks/useSimulatorConfig';
 
 // Mock alert
-global.alert = jest.fn();
+global.alert = vi.fn();
 
 describe('useSimulatorConfig', () => {
   it('should initialize with default values', () => {
